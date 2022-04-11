@@ -1,5 +1,5 @@
 
-name: Sync small
+name: small
 
 on:
   push:

@@ -8,6 +8,7 @@ sed -i \
 */Makefile
 
 sed -i 's/luci-lib-ipkg/luci-base/g' luci-app-store/Makefile
+sed -i 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' brook/Makefile
 
 bash diy/create_acl_for_luci.sh -a >/dev/null 2>&1
 bash diy/convert_translation.sh -a >/dev/null 2>&1

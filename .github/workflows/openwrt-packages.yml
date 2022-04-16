@@ -6,7 +6,7 @@ on:
     paths:
       - '.github/workflows/openwrt-packages.yml'
   schedule:
-    - cron: 3-53/60 8,23 * * *
+    - cron: 40 8,23 * * *
   watch:
     types: started
   repository_dispatch:

@@ -36,6 +36,7 @@ git clone --depth 1 https://github.com/UnblockNeteaseMusic/luci-app-unblocknetea
 git clone --depth 1 -b luci https://github.com/xiaorouji/openwrt-passwall passwall1 && mv -n passwall1/luci-app-passwall  ./; rm -rf passwall1
 git clone --depth 1 https://github.com/kiddin9/openwrt-bypass && mv -n openwrt-bypass/luci-app-bypass openwrt-bypass/lua-maxminddb ./ ; rm -rf openwrt-bypass
 
+svn co https://github.com/kiddin9/openwrt-packages/trunk/luci-app-fileassistant
 svn co https://github.com/immortalwrt/luci/trunk/applications/luci-app-filebrowser
 svn co https://github.com/immortalwrt/luci/trunk/applications/luci-app-aliddns
 svn co https://github.com/sirpdboy/sirpdboy-package/trunk/luci-app-koolddns

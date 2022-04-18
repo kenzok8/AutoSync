@@ -68,7 +68,7 @@ make menuconfig
 | luci-app-store               | store software repository            |  应用商店   |
 | luci-app-unblockneteasemusic | Unlock NetEase Cloud Music         | 解锁网易云音乐   |
 | luci-app-aliyundrive-webdav  | Aliyun Disk WebDAV Service            |  阿里云盘 WebDAV 服务   |
-
+| luci-app-amlogic  | Amlogic Service            |  晶晨宝盒   |
 
 * Modify argon to argonne, including argonne-config, to prevent argon with the same name from affecting compilation
 

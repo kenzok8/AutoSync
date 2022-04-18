@@ -60,7 +60,6 @@ svn co https://github.com/coolsnowwolf/packages/trunk/net/microsocks
 svn co https://github.com/coolsnowwolf/packages/trunk/net/redsocks2
 svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash
 svn co https://github.com/lisaac/luci-app-dockerman/trunk/applications/luci-app-dockerman
-svn co https://github.com/Carseason/openwrt-themedog/trunk/luci/luci-themedog
 svn co https://github.com/xiaorouji/openwrt-passwall2/trunk/luci-app-passwall2
 svn co https://github.com/Lienol/openwrt-package/trunk/luci-app-ssr-mudb-server
 svn co https://github.com/coolsnowwolf/packages/trunk/multimedia/UnblockNeteaseMusic

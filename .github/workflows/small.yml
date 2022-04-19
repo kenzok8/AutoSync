@@ -52,13 +52,19 @@ jobs:
         [ -e $GITHUB_WORKSPACE/LICENSE ] && cp $GITHUB_WORKSPACE/LICENSE $GITHUB_WORKSPACE/${{matrix.target}}
         [ -e $GITHUB_WORKSPACE/README.md ] && cp $GITHUB_WORKSPACE/README.md $GITHUB_WORKSPACE/${{matrix.target}}
         cd $GITHUB_WORKSPACE/${{matrix.target}}
-        git diff --exit-code || git commit -am "update $(date +%Y-%m-%d" "%H:%M:%S)"
-        git push --force "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/small.git" HEAD:${{matrix.target}}    
-        
-    - name: Delete workflow runs
-      uses: Mattraks/delete-workflow-runs@v2.0.1
-      continue-on-error: true
+        git add .
+        git commit -am "update $(date +%Y-%m-%d" "%H:%M:%S)"
+           
+    - name: Push changes
+      uses: ad-m/github-push-action@master
       with:
+        github_token: ${{secrets.ACCESS_TOKEN}}
+
+    - name: Cleanup Workflow Logs
+      uses: Mattraks/delete-workflow-runs@main
+      with:
+        token: ${{ github.token }}
+        repository: ${{ github.repository }}
         retain_days: 1
-        keep_minimum_runs: 0
+        keep_minimum_runs: 1
 

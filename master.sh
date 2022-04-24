@@ -34,8 +34,14 @@ git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
 git clone --depth 1 https://github.com/Huangjoe123/luci-app-eqos
 git clone --depth 1 https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic
 git clone --depth 1 -b luci https://github.com/xiaorouji/openwrt-passwall passwall1 && mv -n passwall1/luci-app-passwall  ./; rm -rf passwall1
+git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall2 passwall2 && mv -n passwall2/luci-app-passwall2 ./;rm -rf passwall2
 git clone --depth 1 https://github.com/kiddin9/openwrt-bypass && mv -n openwrt-bypass/luci-app-bypass openwrt-bypass/lua-maxminddb ./ ; rm -rf openwrt-bypass
 git clone --depth 1 https://github.com/ophub/luci-app-amlogic amlogic && mv -n amlogic/luci-app-amlogic amlogic/depends/* ./;rm -rf amlogic
+git clone --depth 1 https://github.com/linkease/istore && mv -n istore/luci/* ./; rm -rf istore
+git clone --depth 1 https://github.com/linkease/nas-packages && mv -n nas-packages/network/services/* ./; rm -rf nas-packages
+git clone --depth 1 https://github.com/linkease/nas-packages-luci && mv -n nas-packages-luci/luci/* ./; rm -rf nas-packages-luci
+git clone --depth 1 https://github.com/messense/aliyundrive-webdav aliyundrive && mv -n aliyundrive/openwrt/* ./ ; rm -rf aliyundrive
+git clone --depth 1 https://github.com/lisaac/luci-app-dockerman dockerman && mv -n dockerman/applications/* ./; rm -rf dockerman
 
 svn co https://github.com/kiddin9/openwrt-packages/trunk/luci-app-fileassistant
 svn co https://github.com/immortalwrt/luci/trunk/applications/luci-app-filebrowser
@@ -49,19 +55,12 @@ svn co https://github.com/kenzok8/litte/trunk/luci-theme-atmaterial_new
 svn co https://github.com/kenzok8/litte/trunk/luci-theme-mcat
 svn co https://github.com/kenzok8/litte/trunk/luci-theme-tomato
 svn co https://github.com/kiddin9/openwrt-packages/trunk/luci-app-diskman
-svn co https://github.com/messense/aliyundrive-webdav/trunk/openwrt aliyundrive && mvdir aliyundrive
-svn co https://github.com/linkease/istore/trunk/luci/luci-app-store
-svn co https://github.com/linkease/istore-ui/trunk/app-store-ui
-svn co https://github.com/linkease/nas-packages/trunk/network/services/ddnsto
-svn co https://github.com/linkease/nas-packages-luci/trunk/luci/luci-app-ddnsto
 svn co https://github.com/fw876/helloworld/trunk/luci-app-ssr-plus
 svn co https://github.com/fw876/helloworld/trunk/naiveproxy
 svn co https://github.com/fw876/helloworld/trunk/tcping
 svn co https://github.com/coolsnowwolf/packages/trunk/net/microsocks
 svn co https://github.com/coolsnowwolf/packages/trunk/net/redsocks2
 svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash
-svn co https://github.com/lisaac/luci-app-dockerman/trunk/applications/luci-app-dockerman
-svn co https://github.com/xiaorouji/openwrt-passwall2/trunk/luci-app-passwall2
 svn co https://github.com/Lienol/openwrt-package/trunk/luci-app-ssr-mudb-server
 svn co https://github.com/coolsnowwolf/packages/trunk/multimedia/UnblockNeteaseMusic
 svn co https://github.com/immortalwrt/packages/trunk/net/gost

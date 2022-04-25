@@ -66,9 +66,6 @@ svn co https://github.com/coolsnowwolf/packages/trunk/multimedia/UnblockNeteaseM
 svn co https://github.com/immortalwrt/packages/trunk/net/gost
 svn co https://github.com/immortalwrt/packages/trunk/utils/filebrowser
 
-bash diy/create_acl_for_luci.sh -a >/dev/null 2>&1
-bash diy/convert_translation.sh -a >/dev/null 2>&1
-
 rm -rf ./*/.git & rm -rf ./*/.gitattributes
 rm -rf ./*/.svn & rm -rf ./*/.github & rm -rf ./*/.gitignore
 

@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - '.github/workflows/litte.yml'
+      - 'diy/**'      
   schedule:
     - cron: 40 8,23 * * *
   watch:
@@ -41,7 +42,7 @@ jobs:
         git clone -b master https://github.com/kenzok8/litte.git ${{matrix.target}}
         cd ${{matrix.target}}
         git rm -r --cache * >/dev/null 2>&1 &
-        rm -rf `find ./* -maxdepth 0 -type d ! -name "commit""diy"` >/dev/null 2>&1     
+        rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1     
         $GITHUB_WORKSPACE/${{matrix.target}}.sh
         
     - name: Upload

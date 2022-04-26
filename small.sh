@@ -29,8 +29,7 @@ svn export --force https://github.com/fw876/helloworld/trunk/v2raya
 svn export --force https://github.com/fw876/helloworld/trunk/xray-core
 svn export --force https://github.com/fw876/helloworld/trunk/xray-plugin
 
-bash diy/create_acl_for_luci.sh -a >/dev/null 2>&1
-bash diy/convert_translation.sh -a >/dev/null 2>&1
+sed -i 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' brook/Makefile
 
 rm -rf ./*/.git & rm -f ./*/.gitattributes
 rm -rf ./*/.svn & rm -rf ./*/.github & rm -rf ./*/.gitignore

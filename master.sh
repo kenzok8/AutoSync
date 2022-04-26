@@ -80,9 +80,6 @@ rm -rf ./*/.git & rm -rf ./*/.gitattributes
 rm -rf ./*/.svn & rm -rf ./*/.github & rm -rf ./*/.gitignore
 
 
-# Use it under GPLv3, please.
-# --------------------------------------------------------
-# Script for convert_translation LuCI APP
 for e in $(ls -d luci-*/po); do
 	if [[ -d $e/zh-cn && ! -d $e/zh_Hans ]]; then
 		ln -s zh-cn $e/zh_Hans 2>/dev/null
@@ -91,10 +88,6 @@ for e in $(ls -d luci-*/po); do
 	fi
 done
 
-
-# Use it under GPLv3, please.
-# --------------------------------------------------------
-# Script for creating ACL file for each LuCI APP
 
 error_font="\033[31m[Error]$\033[0m "
 success_font="\033[32m[Success]\033[0m "

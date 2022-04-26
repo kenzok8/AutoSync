@@ -29,10 +29,12 @@ svn export --force https://github.com/fw876/helloworld/trunk/v2raya
 svn export --force https://github.com/fw876/helloworld/trunk/xray-core
 svn export --force https://github.com/fw876/helloworld/trunk/xray-plugin
 
-sed -i 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' brook/Makefile
+sed -i \
+-e 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' \
+-e 's?\.\./\.\./luci.mk?$(TOPDIR)/feeds/luci/luci.mk?' \
+*/Makefile
 
 rm -rf ./*/.git & rm -f ./*/.gitattributes
 rm -rf ./*/.svn & rm -rf ./*/.github & rm -rf ./*/.gitignore
-
 
 exit 0

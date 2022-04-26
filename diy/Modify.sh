@@ -8,7 +8,6 @@ sed -i \
 */Makefile
 
 sed -i 's/luci-lib-ipkg/luci-base/g' luci-app-store/Makefile
-sed -i 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' brook/Makefile
 sed -i 's/"nas"/"services"/g' luci-app-fileassistant/luasrc/controller/fileassistant.lua
 sed -i 's/"NAS"/"Services"/g' luci-app-fileassistant/luasrc/controller/fileassistant.lua
 sed -i 's/nas/services/g' luci-app-fileassistant/htdocs/luci-static/resources/fileassistant/fb.js

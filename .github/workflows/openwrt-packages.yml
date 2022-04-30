@@ -59,7 +59,7 @@ jobs:
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@v2.0.1
       with:
-        token: ${{ secrets.ACTION_SECRET }}
+        token: ${{ secrets.ACCESS_TOKEN }}
         repository: kenzok8/openwrt-packages
         retain_days: 1
-        keep_minimum_runs: 3
+        keep_minimum_runs: 1

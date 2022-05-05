@@ -27,6 +27,7 @@ git clone --depth 1 https://github.com/sirpdboy/luci-app-advanced
 git clone --depth 1 https://github.com/jefferymvp/luci-app-koolproxyR
 git clone --depth 1 https://github.com/hubbylei/luci-app-clash
 git clone --depth 1 https://github.com/QiuSimons/openwrt-mos && mv -n openwrt-mos/*mosdns ./ ; rm -rf openwrt-mos
+git clone --depth 1 https://github.com/kenzok8/luci-theme-ifit ifit && mv -n ifit/luci-app-ifit ./;rm -rf ifit
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argonne
 git clone --depth 1 https://github.com/kenzok78/luci-app-argonne-config
 git clone --depth 1 https://github.com/thinktip/luci-theme-neobird
@@ -46,8 +47,10 @@ git clone --depth 1 https://github.com/lisaac/luci-app-dockerman dockerman && mv
 svn export https://github.com/kiddin9/openwrt-packages/trunk/luci-app-fileassistant
 svn export https://github.com/immortalwrt/luci/trunk/applications/luci-app-filebrowser
 svn export https://github.com/immortalwrt/luci/trunk/applications/luci-app-aliddns
+svn export https://github.com/immortalwrt/packages/trunk/net/gost
+svn export https://github.com/immortalwrt/packages/trunk/net/smartdns
+svn export https://github.com/immortalwrt/packages/trunk/utils/filebrowser
 svn export https://github.com/sirpdboy/sirpdboy-package/trunk/luci-app-koolddns
-svn export https://github.com/kenzok8/luci-theme-ifit/trunk/luci-theme-ifit
 svn export https://github.com/kenzok8/jell/trunk/luci-app-adguardhome
 svn export https://github.com/kenzok8/jell/trunk/adguardhome
 svn export https://github.com/kenzok8/litte/trunk/luci-theme-atmaterial_new
@@ -62,9 +65,6 @@ svn export https://github.com/coolsnowwolf/packages/trunk/net/redsocks2
 svn export https://github.com/vernesong/OpenClash/trunk/luci-app-openclash
 svn export https://github.com/Lienol/openwrt-package/trunk/luci-app-ssr-mudb-server
 svn export https://github.com/coolsnowwolf/packages/trunk/multimedia/UnblockNeteaseMusic
-svn export https://github.com/immortalwrt/packages/trunk/net/gost
-svn export https://github.com/immortalwrt/packages/trunk/net/smartdns
-svn export https://github.com/immortalwrt/packages/trunk/utils/filebrowser
 
 rm -rf ./*/.git & rm -rf ./*/.gitattributes
 rm -rf ./*/.svn & rm -rf ./*/.github & rm -rf ./*/.gitignore

@@ -16,7 +16,7 @@ rm -rf $1
 }
 
 git clone --depth 1 -b packages https://github.com/xiaorouji/openwrt-passwall && mv -n openwrt-passwall/chinadns-ng openwrt-passwall/dns2socks openwrt-passwall/hysteria openwrt-passwall/ipt2socks openwrt-passwall/pdnsd-alt openwrt-passwall/trojan-go openwrt-passwall/trojan-plus openwrt-passwall/ssocks ./ ; rm -rf openwrt-passwall
-svn export --force https://github.com/immortalwrt/packages/trunk/net/brook
+svn export --force https://github.com/kenzok78/small-package/trunk/brook
 svn export --force https://github.com/openwrt/packages/trunk/net/shadowsocks-libev
 svn export --force https://github.com/fw876/helloworld/trunk/simple-obfs
 svn export --force https://github.com/fw876/helloworld/trunk/shadowsocks-rust

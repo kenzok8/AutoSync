@@ -56,8 +56,8 @@ jobs:
         git commit -am "update $(date +%Y-%m-%d" "%H:%M:%S)"
         git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:${{matrix.target}}
 
-    - name: Delete workflow runs
-      uses: Mattraks/delete-workflow-runs@v2.0.1
+    - name: Delete old workflow runs
+      uses: GitRML/delete-workflow-runs@main
       with:
         retain_days: 1
         keep_minimum_runs: 3

@@ -51,7 +51,7 @@ svn export https://github.com/immortalwrt/packages/trunk/net/gost
 svn export https://github.com/immortalwrt/packages/trunk/net/smartdns
 svn export https://github.com/immortalwrt/packages/trunk/utils/filebrowser
 svn export https://github.com/sirpdboy/sirpdboy-package/trunk/luci-app-koolddns
-svn export https://github.com/kenzok8/jell/trunk/luci-app-adguardhome
+svn export https://github.com/kiddin9/openwrt-packages/trunk/luci-app-adguardhome
 svn export https://github.com/kiddin9/openwrt-packages/trunk/adguardhome
 svn export https://github.com/kenzok8/litte/trunk/luci-theme-atmaterial_new
 svn export https://github.com/kenzok8/litte/trunk/luci-theme-mcat

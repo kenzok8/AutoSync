@@ -57,7 +57,7 @@ jobs:
         git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/openwrt-packages.git" HEAD:${{matrix.target}}    
         
     - name: Delete workflow runs
-      uses: Mattraks/delete-workflow-runs@v2.0.1
+      uses: Mattraks/delete-workflow-runs@v2.0.2
       with:
         token: ${{ secrets.ACCESS_TOKEN }}
         repository: kenzok8/openwrt-packages

@@ -59,6 +59,7 @@ svn export https://github.com/kenzok8/litte/trunk/luci-theme-tomato
 svn export https://github.com/kiddin9/openwrt-packages/trunk/luci-app-diskman
 svn export https://github.com/fw876/helloworld/trunk/luci-app-ssr-plus
 svn export https://github.com/fw876/helloworld/trunk/naiveproxy
+svn export https://github.com/fw876/helloworld/trunk/sagernet-core
 svn export https://github.com/fw876/helloworld/trunk/tcping
 svn export https://github.com/coolsnowwolf/packages/trunk/net/microsocks
 svn export https://github.com/coolsnowwolf/packages/trunk/net/redsocks2

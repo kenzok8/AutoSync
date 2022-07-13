@@ -69,6 +69,7 @@ svn export https://github.com/coolsnowwolf/packages/trunk/multimedia/UnblockNete
 
 rm -rf ./*/.git & rm -rf ./*/.gitattributes
 rm -rf ./*/.svn & rm -rf ./*/.github & rm -rf ./*/.gitignore
+find -type f -name Makefile -exec sed -ri  's#mosdns[-_]neo#mosdns#g' {} \;
 
 for e in $(ls -d luci-*/po); do
 	if [[ -d $e/zh-cn && ! -d $e/zh_Hans ]]; then

@@ -6,7 +6,7 @@ on:
     paths:
       - '.github/workflows/small.yml'
   schedule:
-    - cron: 0 */48 * * *
+    - cron: 0 */72 * * *
   watch:
     types: started
   repository_dispatch:

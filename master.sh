@@ -66,7 +66,7 @@ svn export https://github.com/coolsnowwolf/packages/trunk/net/microsocks
 svn export https://github.com/coolsnowwolf/packages/trunk/net/redsocks2
 svn export https://github.com/vernesong/OpenClash/trunk/luci-app-openclash
 svn export https://github.com/Lienol/openwrt-package/trunk/luci-app-ssr-mudb-server
-svn export https://github.com/coolsnowwolf/packages/trunk/multimedia/UnblockNeteaseMusic
+svn export https://github.com/immortalwrt/packages/trunk/multimedia/UnblockNeteaseMusic
 svn export https://github.com/coolsnowwolf/luci/trunk/libs/luci-lib-ipkg
 
 rm -rf ./*/.git & rm -rf ./*/.gitattributes

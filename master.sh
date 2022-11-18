@@ -63,8 +63,8 @@ svn export https://github.com/fw876/helloworld/trunk/lua-neturl
 svn export https://github.com/fw876/helloworld/trunk/naiveproxy
 svn export https://github.com/fw876/helloworld/trunk/sagernet-core
 svn export https://github.com/fw876/helloworld/trunk/tcping
-svn export https://github.com/coolsnowwolf/packages/trunk/net/microsocks
-svn export https://github.com/coolsnowwolf/packages/trunk/net/redsocks2
+svn export https://github.com/fw876/helloworld/trunk/redsocks2
+svn export https://github.com/fw876/helloworld/trunk/microsocks
 svn export https://github.com/vernesong/OpenClash/trunk/luci-app-openclash
 svn export https://github.com/Lienol/openwrt-package/trunk/luci-app-ssr-mudb-server
 svn export https://github.com/immortalwrt/packages/trunk/multimedia/UnblockNeteaseMusic

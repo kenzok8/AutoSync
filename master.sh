@@ -45,11 +45,11 @@ git clone --depth 1 https://github.com/linkease/nas-packages && mv -n nas-packag
 git clone --depth 1 https://github.com/linkease/nas-packages-luci && mv -n nas-packages-luci/luci/luci-app-ddnsto ./; rm -rf nas-packages-luci
 git clone --depth 1 https://github.com/messense/aliyundrive-webdav aliyundrive && mv -n aliyundrive/openwrt/* ./ ; rm -rf aliyundrive
 git clone --depth 1 https://github.com/lisaac/luci-app-dockerman dockerman && mv -n dockerman/applications/* ./; rm -rf dockerman
+git clone --depth 1 https://github.com/honwen/luci-app-aliddns
 
 svn export https://github.com/kiddin9/openwrt-packages/trunk/luci-app-bypass
 svn export https://github.com/kiddin9/openwrt-packages/trunk/luci-app-fileassistant
 svn export https://github.com/immortalwrt/luci/trunk/applications/luci-app-filebrowser
-svn export https://github.com/immortalwrt/luci/trunk/applications/luci-app-aliddns
 svn export https://github.com/immortalwrt/packages/trunk/net/gost
 svn export https://github.com/immortalwrt/packages/trunk/net/smartdns
 svn export https://github.com/immortalwrt/packages/trunk/utils/filebrowser

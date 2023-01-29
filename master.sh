@@ -49,8 +49,8 @@ git clone --depth 1 https://github.com/Hyy2001X/AutoBuild-Packages && mv -n Auto
 git clone --depth 1 https://github.com/vernesong/OpenClash && mv -n OpenClash/luci-app-openclash ./; rm -rf OpenClash
 git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-atmaterial_new litte/luci-theme-mcat litte/luci-theme-tomato ./ ; rm -rf litte
 git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt-packages/luci-app-bypass openwrt-packages/luci-app-fileassistant ./ ; rm -rf openwrt-packages
-git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/luci-app-ssr-plus helloworld/lua-neturl helloworld/naiveproxy helloworld/sagernet-core helloworld/tcping helloworld/redsocks2  helloworld/microsocks ./ ; rm -rf helloworld
-git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/net/gost packages/net/smartdns packages/net/adguardhome packages/utils/filebrowser ./ ; rm -rf packages
+git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/luci-app-ssr-plus ./ ; rm -rf helloworld
+git clone --depth 1 https://github.com/kenzok78/wall && mv -n wall/gost wall/smartdns wall/adguardhome wall/filebrowser wall/lua-neturl wall/naiveproxy wall/sagernet-core wall/tcping wall/redsocks2  wall/microsocks ./ ; rm -rf wall
 git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/luci/applications/luci-app-gost luci/applications/luci-app-dockerman luci/applications/luci-app-filebrowser ./ ; rm -rf luci
 
 svn export https://github.com/coolsnowwolf/luci/trunk/libs/luci-lib-ipkg

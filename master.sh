@@ -43,7 +43,6 @@ git clone --depth 1 https://github.com/linkease/istore && mv -n istore/luci/* ./
 git clone --depth 1 https://github.com/linkease/nas-packages && mv -n nas-packages/network/services/ddnsto ./; rm -rf nas-packages
 git clone --depth 1 https://github.com/linkease/nas-packages-luci && mv -n nas-packages-luci/luci/luci-app-ddnsto ./; rm -rf nas-packages-luci
 git clone --depth 1 https://github.com/messense/aliyundrive-webdav aliyundrive && mv -n aliyundrive/openwrt/* ./ ; rm -rf aliyundrive
-git clone --depth 1 https://github.com/lisaac/luci-app-dockerman dockerman && mv -n dockerman/applications/* ./; rm -rf dockerman
 git clone --depth 1 https://github.com/honwen/luci-app-aliddns
 git clone --depth 1 https://github.com/sbwml/luci-app-alist openwrt-alist && mv -n openwrt-alist/*alist ./ ; rm -rf openwrt-alist
 git clone --depth 1 https://github.com/Hyy2001X/AutoBuild-Packages && mv -n AutoBuild-Packages/luci-app-adguardhome ./; rm -rf AutoBuild-Packages
@@ -52,11 +51,8 @@ git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-a
 git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt-packages/luci-app-bypass openwrt-packages/luci-app-fileassistant ./ ; rm -rf openwrt-packages
 git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/luci-app-ssr-plus helloworld/lua-neturl helloworld/naiveproxy helloworld/sagernet-core helloworld/tcping helloworld/redsocks2  helloworld/microsocks ./ ; rm -rf helloworld
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/net/gost packages/net/smartdns packages/net/adguardhome packages/utils/filebrowser ./ ; rm -rf packages
+git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/luci-app-unblockneteasemusic luci/applications/luci-app-msd_lite luci/applications/luci-app-gost luci/applications/luci-app-dockerman luci/applications/luci-app-filebrowser ./ ; rm -rf luci
 
-svn export https://github.com/immortalwrt/luci/trunk/applications/luci-app-filebrowser
-svn export https://github.com/sirpdboy/sirpdboy-package/trunk/luci-app-koolddns
-svn export https://github.com/Lienol/openwrt-package/trunk/luci-app-ssr-mudb-server
-svn export https://github.com/coolsnowwolf/packages/trunk/multimedia/UnblockNeteaseMusic
 svn export https://github.com/coolsnowwolf/luci/trunk/libs/luci-lib-ipkg
 
 rm -rf ./*/.git & rm -rf ./*/.gitattributes

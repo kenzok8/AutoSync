@@ -51,7 +51,7 @@ git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-a
 git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt-packages/luci-app-bypass openwrt-packages/luci-app-fileassistant ./ ; rm -rf openwrt-packages
 git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/luci-app-ssr-plus helloworld/lua-neturl helloworld/naiveproxy helloworld/sagernet-core helloworld/tcping helloworld/redsocks2  helloworld/microsocks ./ ; rm -rf helloworld
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/net/gost packages/net/smartdns packages/net/adguardhome packages/utils/filebrowser ./ ; rm -rf packages
-git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/luci-app-unblockneteasemusic luci/applications/luci-app-msd_lite luci/applications/luci-app-gost luci/applications/luci-app-dockerman luci/applications/luci-app-filebrowser ./ ; rm -rf luci
+git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/luci/applications/luci-app-gost luci/applications/luci-app-dockerman luci/applications/luci-app-filebrowser ./ ; rm -rf luci
 
 svn export https://github.com/coolsnowwolf/luci/trunk/libs/luci-lib-ipkg
 

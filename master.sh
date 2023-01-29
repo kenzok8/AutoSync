@@ -55,6 +55,22 @@ git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applicatio
 
 svn export https://github.com/coolsnowwolf/luci/trunk/libs/luci-lib-ipkg
 
+sed -i \
+-e 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' \
+-e 's?2. Clash For OpenWRT?3. Applications?' \
+-e 's?\.\./\.\./luci.mk?$(TOPDIR)/feeds/luci/luci.mk?' \
+-e 's/ca-certificates/ca-bundle/' \
+*/Makefile
+
+sed -i 's/luci-lib-ipkg/luci-base/g' luci-app-store/Makefile
+sed -i 's/+dockerd/+dockerd +cgroupfs-mount/' luci-app-docker*/Makefile
+sed -i '$i /etc/init.d/dockerd restart &' luci-app-docker*/root/etc/uci-defaults/*
+sed -i 's/+libcap /+libcap +libcap-bin /' luci-app-openclash/Makefile
+sed -i 's/\(+luci-compat\)/\1 +luci-theme-argon/' luci-app-argon-config/Makefile
+sed -i 's/\(+luci-compat\)/\1 +luci-theme-argonne/' luci-app-argonne-config/Makefile
+sed -i "s/nas/services/g" `grep nas -rl luci-app-fileassistant`
+sed -i "s/NAS/Services/g" `grep NAS -rl luci-app-fileassistant`
+
 rm -rf ./*/.git & rm -rf ./*/.gitattributes
 rm -rf ./*/.svn & rm -rf ./*/.github & rm -rf ./*/.gitignore
 find -type f -name Makefile -exec sed -ri  's#mosdns[-_]neo#mosdns#g' {} \;

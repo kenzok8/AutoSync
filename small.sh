@@ -15,9 +15,7 @@ mv -n `find $1/* -maxdepth 0 -type d` ./
 rm -rf $1
 }
 
-git clone --depth 1 -b packages https://github.com/xiaorouji/openwrt-passwall && mv -n openwrt-passwall/brook openwrt-passwall/chinadns-ng openwrt-passwall/dns2socks openwrt-passwall/dns2tcp openwrt-passwall/v2ray-geodata openwrt-passwall/hysteria openwrt-passwall/ipt2socks openwrt-passwall/pdnsd-alt openwrt-passwall/trojan-go openwrt-passwall/trojan-plus openwrt-passwall/ssocks ./ ; rm -rf openwrt-passwall
-git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/simple-obfs helloworld/shadowsocks-rust helloworld/shadowsocksr-libev helloworld/trojan helloworld/v2ray-core helloworld/v2ray-plugin helloworld/v2raya helloworld/xray-core helloworld/xray-plugin ./ ; rm -rf helloworld
-
+git clone --depth 1 https://github.com/kenzok78/wall && mv -n wall/brook wall/chinadns-ng wall/dns2socks wall/dns2tcp wall/v2ray-geodata wall/hysteria wall/ipt2socks wall/pdnsd-alt wall/trojan-go wall/trojan-plus wall/ssocks  wall/simple-obfs wall/shadowsocks-rust wall/shadowsocksr-libev wall/trojan wall/v2ray-core wall/v2ray-plugin wall/v2raya wall/xray-core wall/xray-plugin ./ ; rm -rf wall
 
 sed -i \
 -e 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' \

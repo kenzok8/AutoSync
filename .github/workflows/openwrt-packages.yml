@@ -11,9 +11,9 @@ on:
   repository_dispatch:
 
 jobs:
-  build:
+  job_openwrt-packages:
     if: github.event.repository.owner.id == github.event.sender.id || ! github.event.sender.id
-    runs-on: Ubuntu-20.04
+    runs-on: ubuntu-latest
 
     name: Update openwrt-packages
     strategy:

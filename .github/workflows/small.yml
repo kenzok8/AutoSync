@@ -4,7 +4,7 @@ name: small
 on:
   push:
     paths:
-      - '.github/workflows/small.yml'
+      - '.github/workflows/litte.yml'
   schedule:
     - cron: 0 */12 * * *
   watch:
@@ -12,27 +12,21 @@ on:
   repository_dispatch:
 
 jobs:
-  job_small:
+  build:
     if: github.event.repository.owner.id == github.event.sender.id || ! github.event.sender.id
-    runs-on: ubuntu-latest
+    runs-on: Ubuntu-20.04
 
-    name: Delete workflow runs
-    uses: Mattraks/delete-workflow-runs@main
-    with:
-      retain_days: 1
-      keep_minimum_runs: 1
-
+    name: Update litte
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [master]
+        
     steps:
     - name: Checkout
       uses: actions/checkout@main
       with:
         fetch-depth: 0
-
-    - name: Update small
-      strategy:
-        fail-fast: false
-        matrix:
-          target: [master]
 
     - name: Initialization environment
       run : |
@@ -60,4 +54,9 @@ jobs:
         git add .
         git commit -am "update $(date +%Y-%m-%d" "%H:%M:%S)"
         git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/small.git" HEAD:${{matrix.target}}
-        
+
+    - name: Delete workflow runs
+      uses: Mattraks/delete-workflow-runs@main
+      with:
+        retain_days: 1
+        keep_minimum_runs: 1       

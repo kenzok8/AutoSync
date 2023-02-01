@@ -15,7 +15,7 @@ jobs:
   job_small:
     if: github.event.repository.owner.id == github.event.sender.id || ! github.event.sender.id
     runs-on: ubuntu-latest
-    steps:
+
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@main
       with:
@@ -28,6 +28,7 @@ jobs:
         matrix:
           target: [master]
 
+    steps:
     - name: Checkout
       uses: actions/checkout@main
       with:

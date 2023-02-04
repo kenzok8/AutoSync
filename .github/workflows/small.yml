@@ -4,8 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/small.yml'
-      - 'master.sh'
-      - 'diy/**'
+      - 'small.sh'
   schedule:
     - cron: 0 */12 * * *
   repository_dispatch:

@@ -3,7 +3,7 @@ name: openwrt-packages
 on:
   push:
     paths:
-      - '.github/workflows/wall.yml'
+      - '.github/workflows/openwrt-packages.yml'
       - 'master.sh'
       - 'diy/**'    
   schedule:

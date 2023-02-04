@@ -3,7 +3,7 @@ name: litte
 on:
   push:
     paths:
-      - '.github/workflows/wall.yml'
+      - '.github/workflows/litte.yml'
       - 'master.sh'
       - 'diy/**'
   schedule:

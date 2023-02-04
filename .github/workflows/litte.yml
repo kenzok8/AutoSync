@@ -3,7 +3,9 @@ name: litte
 on:
   push:
     paths:
-      - '.github/workflows/litte.yml'
+      - '.github/workflows/wall.yml'
+      - 'master.sh'
+      - 'diy/**'
   schedule:
     - cron: 0 */12 * * *
   repository_dispatch:

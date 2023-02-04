@@ -4,8 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/litte.yml'
-      - 'master.sh'
-      - 'diy/**'
+      - 'commit/**'
   schedule:
     - cron: 0 */12 * * *
   repository_dispatch:

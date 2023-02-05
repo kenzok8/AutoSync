@@ -47,7 +47,8 @@ jobs:
         git rm -r --cache * >/dev/null 2>&1 &
         rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1     
         $GITHUB_WORKSPACE/${{matrix.target}}.sh
-        cp -r ./diy/. ./
+        cp -r /diy/. ./
+	chmod +x convert_translation.sh && chmod +x convert_translation.sh
         /bin/bash convert_translation.sh
         /bin/bash create_acl_for_luci.sh
 

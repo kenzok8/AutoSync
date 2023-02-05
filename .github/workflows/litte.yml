@@ -49,6 +49,7 @@ jobs:
         $GITHUB_WORKSPACE/${{matrix.target}}.sh
         bash /$GITHUB_WORKSPACE/diy/convert_translation.sh
         bash /$GITHUB_WORKSPACE/diy/create_acl_for_luci.sh -a
+        bash /$GITHUB_WORKSPACE/diy/Modify.sh
 
     - name: Upload
       env: 

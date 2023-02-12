@@ -66,10 +66,10 @@ jobs:
         else
           echo "nothing to commit"
           exit 0
-        fi
+        fi || exit 0
 
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@main
       with:
         retain_days: 1
-        keep_minimum_runs: 1       
+        keep_minimum_runs: 1

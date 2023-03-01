@@ -73,11 +73,7 @@ sed -i -e 's/nas/system/g' -e 's/NAS/System/g' $(grep -rl 'nas\|NAS' luci-app-fi
 sed -i 's/pkg_web_version:=.*/pkg_web_version:=$pkg_version/' alist/Makefile
 sed -i -e 's#option binpath '\''/tmp/AdGuardHome/AdGuardHome'\''#option binpath '\''/usr/bin/AdGuardHome'\''#g' -e 's#option workdir '\''/usr/bin/AdGuardHome'\''#option workdir '\''/etc/AdGuardHome'\''#g' luci-app-adguardhome/root/etc/config/AdGuardHome
 
-rm -rf ./*/.git & rm -rf ./*/.gitattributes
-rm -rf ./*/.svn & rm -rf ./*/.github & rm -rf ./*/.gitignore
-
-rm -rf create_acl_for_luci.err & rm -rf create_acl_for_luci.ok
-rm -rf create_acl_for_luci.warn
+rm -rf ./*/.git ./*/.gitattributes ./*/.svn ./*/.github ./*/.gitignore create_acl_for_luci.err create_acl_for_luci.ok create_acl_for_luci.warn
 
 
 exit 0

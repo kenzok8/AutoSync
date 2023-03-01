@@ -22,6 +22,7 @@ sed -i \
 -e 's?\.\./\.\./luci.mk?$(TOPDIR)/feeds/luci/luci.mk?' \
 */Makefile
 
-find . \( -name '.git' -o -name '.gitattributes' -o -name '.svn' -o -name '.github' -o -name '.gitignore' \) -exec rm -rf {} +
+rm -rf ./*/.git & rm -rf ./*/.gitattributes
+rm -rf ./*/.svn & rm -rf ./*/.github & rm -rf ./*/.gitignore
 
 exit 0

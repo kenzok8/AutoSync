@@ -31,6 +31,7 @@ git clone --depth 1 https://github.com/QiuSimons/openwrt-mos && mv -n openwrt-mo
 git clone --depth 1 https://github.com/kenzok8/luci-theme-ifit ifit && mv -n ifit/luci-theme-ifit ./;rm -rf ifit
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argonne
 git clone --depth 1 https://github.com/kenzok78/luci-app-argonne-config
+git clone --depth 1 https://github.com/thinktip/luci-theme-neobird
 git clone --depth 1 https://github.com/gngpp/luci-theme-design
 git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
 git clone --depth 1 https://github.com/Huangjoe123/luci-app-eqos
@@ -48,7 +49,7 @@ git clone --depth 1 https://github.com/Hyy2001X/AutoBuild-Packages && mv -n Auto
 git clone --depth 1 https://github.com/sbwml/luci-app-alist openwrt-alist && mv -n openwrt-alist/*alist ./ ; rm -rf openwrt-alist
 git clone --depth 1 https://github.com/sirpdboy/sirpdboy-package && mv -n sirpdboy-package/luci-app-dockerman ./ ; rm -rf sirpdboy-package
 git clone --depth 1 https://github.com/vernesong/OpenClash && mv -n OpenClash/luci-app-openclash ./; rm -rf OpenClash
-git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-atmaterial_new litte/luci-theme-mcat litte/luci-theme-tomato ./ ; rm -rf litte
+git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-atmaterial_new litte/luci-theme-tomato ./ ; rm -rf litte
 git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt-packages/luci-app-bypass openwrt-packages/luci-app-fileassistant ./ ; rm -rf openwrt-packages
 git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/luci-app-ssr-plus helloworld/naiveproxy ./ ; rm -rf helloworld
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/UnblockNeteaseMusic wall/gost wall/smartdns wall/adguardhome wall/filebrowser wall/lua-neturl wall/sagernet-core wall/tcping wall/redsocks2  wall/microsocks ./ ; rm -rf wall

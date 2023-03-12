@@ -22,7 +22,6 @@ sed -i \
 -e 's?\.\./\.\./luci.mk?$(TOPDIR)/feeds/luci/luci.mk?' \
 */Makefile
 
-sed -i 's/PKG_HASH:=.*/PKG_HASH:=skip/' chinadns-ng/Makefile
 rm -rf ./*/.git ./*/.gitattributes ./*/.svn ./*/.github ./*/.gitignore
 
 exit 0

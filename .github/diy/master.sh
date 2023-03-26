@@ -76,7 +76,7 @@ sed -i 's/\(+luci-compat\)/\1 +luci-theme-argonne/' luci-app-argonne-config/Make
 sed -i -e 's/nas/services/g' -e 's/NAS/Services/g' $(grep -rl 'nas\|NAS' luci-app-fileassistant)
 sed -i 's/pkg_web_version:=.*/pkg_web_version:=$pkg_version/' alist/Makefile
 sed -i -e 's#option binpath '\''/tmp/AdGuardHome/AdGuardHome'\''#option binpath '\''/usr/bin/AdGuardHome'\''#g' -e 's#option workdir '\''/usr/bin/AdGuardHome'\''#option workdir '\''/etc/AdGuardHome'\''#g' luci-app-adguardhome/root/etc/config/AdGuardHome
-
+sed -i '65,73d' adguardhome/Makefile
 rm -rf ./*/.git ./*/.gitattributes ./*/.svn ./*/.github ./*/.gitignore create_acl_for_luci.err create_acl_for_luci.ok create_acl_for_luci.warn
 
 

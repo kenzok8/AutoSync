@@ -46,7 +46,6 @@ git clone --depth 1 https://github.com/linkease/nas-packages && mv -n nas-packag
 git clone --depth 1 https://github.com/linkease/nas-packages-luci && mv -n nas-packages-luci/luci/luci-app-ddnsto ./; rm -rf nas-packages-luci
 git clone --depth 1 https://github.com/messense/aliyundrive-webdav aliyundrive && mv -n aliyundrive/openwrt/* ./ ; rm -rf aliyundrive
 git clone --depth 1 https://github.com/honwen/luci-app-aliddns
-git clone --depth 1 https://github.com/Hyy2001X/AutoBuild-Packages && mv -n AutoBuild-Packages/luci-app-adguardhome ./; rm -rf AutoBuild-Packages
 git clone --depth 1 https://github.com/sbwml/luci-app-alist openwrt-alist && mv -n openwrt-alist/*alist ./ ; rm -rf openwrt-alist
 git clone --depth 1 https://github.com/sirpdboy/sirpdboy-package && mv -n sirpdboy-package/luci-app-dockerman ./ ; rm -rf sirpdboy-package
 git clone --depth 1 https://github.com/vernesong/OpenClash && mv -n OpenClash/luci-app-openclash ./; rm -rf OpenClash
@@ -55,7 +54,8 @@ git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt
 git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/luci-app-ssr-plus helloworld/naiveproxy ./ ; rm -rf helloworld
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/UnblockNeteaseMusic wall/gost wall/smartdns wall/adguardhome wall/filebrowser wall/lua-neturl wall/sagernet-core wall/tcping wall/redsocks2 wall/microsocks ./ ; rm -rf wall
 git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/luci-app-gost luci/applications/luci-app-filebrowser ./ ; rm -rf luci
-
+svn export https://github.com/kenzok8/jell/trunk/gn
+svn export https://github.com/kenzok8/small-package/trunk/luci-app-adguardhome
 svn export https://github.com/coolsnowwolf/luci/trunk/libs/luci-lib-ipkg
 
 sed -i \
@@ -74,7 +74,6 @@ sed -i 's/\(+luci-compat\)/\1 +luci-theme-design/' luci-theme-design-config/Make
 sed -i 's/\(+luci-compat\)/\1 +luci-theme-argonne/' luci-app-argonne-config/Makefile
 sed -i -e 's/nas/services/g' -e 's/NAS/Services/g' $(grep -rl 'nas\|NAS' luci-app-fileassistant)
 sed -i 's/pkg_web_version:=.*/pkg_web_version:=$pkg_version/' alist/Makefile
-sed -i -e 's#option binpath '\''/tmp/AdGuardHome/AdGuardHome'\''#option binpath '\''/usr/bin/AdGuardHome'\''#g' -e 's#option workdir '\''/usr/bin/AdGuardHome'\''#option workdir '\''/etc/AdGuardHome'\''#g' luci-app-adguardhome/root/etc/config/AdGuardHome
 sed -i '65,73d' adguardhome/Makefile
 rm -rf ./*/.git ./*/.gitattributes ./*/.svn ./*/.github ./*/.gitignore create_acl_for_luci.err create_acl_for_luci.ok create_acl_for_luci.warn
 

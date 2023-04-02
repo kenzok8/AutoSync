@@ -31,7 +31,6 @@ git clone --depth 1 https://github.com/QiuSimons/openwrt-mos && mv -n openwrt-mo
 git clone --depth 1 https://github.com/kenzok8/luci-theme-ifit ifit && mv -n ifit/luci-theme-ifit ./;rm -rf ifit
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argonne
 git clone --depth 1 https://github.com/kenzok78/luci-app-argonne-config
-git clone --depth 1 https://github.com/thinktip/luci-theme-neobird
 git clone --depth 1 https://github.com/gngpp/luci-theme-design
 git clone --depth 1 https://github.com/gngpp/luci-app-design-config
 git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns

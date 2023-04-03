@@ -31,6 +31,7 @@ git clone --depth 1 https://github.com/QiuSimons/openwrt-mos && mv -n openwrt-mo
 git clone --depth 1 https://github.com/kenzok8/luci-theme-ifit ifit && mv -n ifit/luci-theme-ifit ./;rm -rf ifit
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argonne
 git clone --depth 1 https://github.com/kenzok78/luci-app-argonne-config
+git clone --depth 1 https://github.com/kenzok78/luci-app-adguardhome
 git clone --depth 1 https://github.com/gngpp/luci-theme-design
 git clone --depth 1 https://github.com/gngpp/luci-app-design-config
 git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
@@ -54,7 +55,6 @@ git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/luci
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/UnblockNeteaseMusic wall/gost wall/smartdns wall/adguardhome wall/filebrowser wall/lua-neturl wall/sagernet-core wall/tcping wall/redsocks2 wall/microsocks ./ ; rm -rf wall
 git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/luci-app-gost luci/applications/luci-app-filebrowser ./ ; rm -rf luci
 svn export https://github.com/kenzok8/jell/trunk/gn
-svn export https://github.com/kenzok8/small-package/trunk/luci-app-adguardhome
 svn export https://github.com/coolsnowwolf/luci/trunk/libs/luci-lib-ipkg
 
 sed -i \
@@ -75,7 +75,6 @@ sed -i -e 's/nas/services/g' -e 's/NAS/Services/g' $(grep -rl 'nas\|NAS' luci-ap
 sed -i 's/pkg_web_version:=.*/pkg_web_version:=$pkg_version/' alist/Makefile
 sed -i '65,73d' adguardhome/Makefile
 rm -rf ./*/.git ./*/.gitattributes ./*/.svn ./*/.github ./*/.gitignore create_acl_for_luci.err create_acl_for_luci.ok create_acl_for_luci.warn
-
 
 exit 0
 

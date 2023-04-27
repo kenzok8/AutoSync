@@ -25,7 +25,7 @@
 ##### 插件每日更新下载:
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/kenzok8/compile-package?style=for-the-badge&label=插件更新下载)](https://github.com/kenzok8/compile-package/releases/latest)
 
-+ [passwall依赖](https://github.com/kenzok8/small)
++ [ssr+passwall依赖仓库](https://github.com/kenzok8/small)
 
 + [openwrt固件与插件下载](https://op.dllkids.xyz/)
 

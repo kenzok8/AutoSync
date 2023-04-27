@@ -13,6 +13,8 @@
 
 <br>中文 | [English](README_en.md)
 
+* 把openwrt-package与small仓库重新归类，ssr、passwall、vssr以及依赖合并smll
+
 * 喜欢追新的可以去下载small-package，该仓库每天自动同步更新
 
 * [small-package仓库地址](https://github.com/kenzok8/small-package) 
@@ -24,8 +26,6 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/kenzok8/compile-package?style=for-the-badge&label=插件更新下载)](https://github.com/kenzok8/compile-package/releases/latest)
 
 + [passwall依赖](https://github.com/kenzok8/small)
-
-+ [xiaorouji仓库](https://github.com/xiaorouji/openwrt-passwall)
 
 + [openwrt固件与插件下载](https://op.dllkids.xyz/op/firmware/)
 

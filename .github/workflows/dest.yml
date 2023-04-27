@@ -1,19 +1,13 @@
 name: dest
 
 on:
+ workflow_dispatch:
   push:
     paths:
       - '.github/workflows/dest.yml'
       - 'small.sh'
   schedule:
     - cron: 0 */6 * * *
-  repository_dispatch:
-  workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'ssh'
-        required: false
-        default: 'false'
 
 jobs:
   job_dest:

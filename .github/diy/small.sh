@@ -14,8 +14,12 @@ function mvdir() {
 mv -n `find $1/* -maxdepth 0 -type d` ./
 rm -rf $1
 }
-
-git clone --depth 1 https://github.com/kenzok78/wall && mv -n wall/brook wall/chinadns-ng wall/dns2socks wall/dns2tcp wall/v2ray-geodata wall/hysteria wall/ipt2socks wall/pdnsd-alt wall/trojan-go wall/trojan-plus wall/ssocks  wall/simple-obfs wall/shadowsocks-rust wall/shadowsocksr-libev wall/trojan wall/v2ray-core wall/v2ray-plugin wall/v2raya wall/xray-core wall/xray-plugin ./ ; rm -rf wall
+git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/* ./ ; rm -rf {UnblockNeteaseMusic,adguardhome,alist,dockerd,filebrowser,gost,lucky,mosdns,sagernet-core,smartdns,ucl,upx-static,upx} && rm -rf wall
+git clone --depth 1 https://github.com/jerrykuku/luci-app-vssr
+git clone --depth 1 -b luci https://github.com/xiaorouji/openwrt-passwall passwall1 && mv -n passwall1/luci-app-passwall  ./; rm -rf passwall1
+git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall2 passwall2 && mv -n passwall2/luci-app-passwall2 ./;rm -rf passwall2
+git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/luci-app-ssr-plus ./ ; rm -rf helloworld
+svn export https://github.com/immortalwrt/packages/trunk/devel/gn
 
 sed -i \
 -e 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' \

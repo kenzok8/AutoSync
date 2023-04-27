@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/dest.yml'
-      - 'dest.sh'
+      - 'small.sh'
   schedule:
     - cron: 0 */6 * * *
   repository_dispatch:
@@ -46,7 +46,7 @@ jobs:
         cd ${{matrix.target}}
         git rm -r --cache * >/dev/null 2>&1 &
         rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1
-        $GITHUB_WORKSPACE/.github/diy/dest.sh
+        $GITHUB_WORKSPACE/.github/diy/small.sh
 
     - name: Upload
       env: 

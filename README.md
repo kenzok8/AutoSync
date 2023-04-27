@@ -13,7 +13,7 @@
 
 <br>中文 | [English](README_en.md)
 
-* 把openwrt-package与small仓库重新归类，ssr、passwall、vssr以及依赖合并smll
+* 把openwrt-packages与small仓库重新归类，ssr、passwall、vssr以及依赖合并smll
 
 * 喜欢追新的可以去下载small-package，该仓库每天自动同步更新
 
@@ -27,7 +27,7 @@
 
 + [passwall依赖](https://github.com/kenzok8/small)
 
-+ [openwrt固件与插件下载](https://op.dllkids.xyz/op/firmware/)
++ [openwrt固件与插件下载](https://op.dllkids.xyz/)
 
 #### 使用
 一键命令

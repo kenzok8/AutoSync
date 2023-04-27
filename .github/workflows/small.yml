@@ -1,19 +1,13 @@
 name: small
 
 on:
+ workflow_dispatch:
   push:
     paths:
       - '.github/workflows/small.yml'
       - 'small.sh'
   schedule:
     - cron: 0 */6 * * *
-  repository_dispatch:
-  workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'SSH connection to Actions'
-        required: false
-        default: 'false'
 
 jobs:
   job_small:

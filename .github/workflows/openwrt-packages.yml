@@ -1,13 +1,19 @@
 name: openwrt-packages
 
 on:
- workflow_dispatch:
   push:
     paths:
       - '.github/workflows/openwrt-packages.yml'
       - 'master.sh'  
   schedule:
     - cron: 0 */6 * * *
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: 'packages'
+        required: false
+        default: 'false'	
 
 jobs:
   job_openwrt-packages:

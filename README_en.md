@@ -25,11 +25,9 @@
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/kenzok8/compile-package?style=for-the-badge&label=插件更新下载)](https://github.com/kenzok8/compile-package/releases/latest)
 
-+ [passwall dependency](https://github.com/kenzok8/small)
++ [ssr+passwall](https://github.com/kenzok8/small)
 
-+ [xiaorouji repository](https://github.com/xiaorouji/openwrt-passwall)
-
-+ [openwrt firmware and plugin download](https://op.dllkids.xyz/)
++ [firmware+plugin](https://op.dllkids.xyz/)
 
 #### Instructions
 add command

@@ -29,7 +29,7 @@
 
 + [xiaorouji repository](https://github.com/xiaorouji/openwrt-passwall)
 
-+ Thank you **kiddin9**[openwrt firmware and plugin download](https://op.dllkids.xyz/op/firmware/)
++ [openwrt firmware and plugin download](https://op.dllkids.xyz/)
 
 #### Instructions
 add command

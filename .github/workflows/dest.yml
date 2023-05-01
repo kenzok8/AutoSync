@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/dest.yml'
-      - 'small.sh'
+      - 'dest.sh'
   schedule:
     - cron: 0 */6 * * *
   repository_dispatch:
@@ -41,12 +41,12 @@ jobs:
     - name: Clone packages
       run: |
         cd $GITHUB_WORKSPACE
-        chmod +x .github/diy/small.sh
+        chmod +x .github/diy/dest.sh
         git clone -b master https://github.com/kenzok8/dest.git ${{matrix.target}}
         cd ${{matrix.target}}
         git rm -r --cache * >/dev/null 2>&1 &
         rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1
-        $GITHUB_WORKSPACE/.github/diy/small.sh
+        $GITHUB_WORKSPACE/.github/diy/dest.sh
 
     - name: Upload
       env: 

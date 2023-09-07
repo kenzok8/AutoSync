@@ -51,27 +51,20 @@ jobs:
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
 
-    - name: Get Plugin Versions
-      id: get_versions
+    - name: Get Plugin Version
+      id: get_version
       run: |
-        cd $GITHUB_WORKSPACE/.github/diy/
-        chmod +x test.sh
-        PLUGIN_VERSION=$("./test.sh")  # 执行脚本并获取输出
+        PLUGIN_VERSION=$(find . -type f -name Makefile -exec grep -E 'PKG_(BASE_)?VERSION\s*?:=' {} \; | awk -F '[:=]' '{print $2}')
         echo "PLUGIN_VERSION=$PLUGIN_VERSION" >> $GITHUB_ENV
 
-    - name: Check and Commit New Versions
-      env:
+    - name: Upload
+      env: 
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         if git status --porcelain | grep .; then
-          PLUGIN_VERSION="${{ steps.get_versions.outputs.plugin_version }}"
-          
-          # 设置提交消息为自定义格式，包括插件版本号
-          COMMIT_MESSAGE="${{matrix.target}}: update to $PLUGIN_VERSION"
-          
           git add .
-          git commit -m "$COMMIT_MESSAGE"
+          git commit -m "update to $PLUGIN_VERSION"  # 在提交消息中包含版本号
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:${{matrix.target}}
         else
           echo "nothing to commit"

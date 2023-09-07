@@ -57,7 +57,7 @@ jobs:
         cd $GITHUB_WORKSPACE/.github/diy/
         chmod +x test.sh
         PLUGIN_VERSION=$("./test.sh")  # 执行脚本并获取输出
-        echo "::set-output name=plugin_version::$PLUGIN_VERSION"  # 将版本号设置为输出变量
+        echo "PLUGIN_VERSION=$PLUGIN_VERSION" >> $GITHUB_ENV
 
     - name: Check and Commit New Versions
       env:

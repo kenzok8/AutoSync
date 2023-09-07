@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# 假设您的插件版本号可以通过执行命令来获取，例如 sing-box version
-PLUGIN_VERSION=$(${{ matrix.packages }} version | grep "$PKG_VERSION")
+# 示例：使用环境变量来引用 matrix.packages 变量
+PLUGIN_VERSION=$("$matrix_packages" version | grep "$PKG_VERSION")
 
 # 将版本号输出到标准输出
 echo "$PLUGIN_VERSION"

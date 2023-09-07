@@ -51,10 +51,13 @@ jobs:
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
 
-    - name: Get Plugin Version
-      id: get_version
+    - name: Extract PLUGIN_VERSION
       run: |
         PLUGIN_VERSION=$(find . -type f -name Makefile -exec grep -E 'PKG_(BASE_)?VERSION\s*?:=' {} \; | awk -F '[:=]' '{print $2}')
+        if [ -z "$PLUGIN_VERSION" ]; then
+            echo "´íÎó£ºÎ´ÕÒµ½ PLUGIN_VERSION »òÎª¿Õ"
+            exit 1
+        fi
         echo "PLUGIN_VERSION=$PLUGIN_VERSION" >> $GITHUB_ENV
 
     - name: Debug PLUGIN_VERSION

@@ -19,7 +19,8 @@ git clone --depth 1 https://github.com/jerrykuku/luci-app-vssr
 git clone --depth 1 -b luci https://github.com/xiaorouji/openwrt-passwall passwall1 && mv -n passwall1/luci-app-passwall  ./; rm -rf passwall1
 git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall2 passwall2 && mv -n passwall2/luci-app-passwall2 ./;rm -rf passwall2
 git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/{luci-app-ssr-plus,tuic-client} ./ ; rm -rf helloworld
-svn export https://github.com/immortalwrt/packages/trunk/devel/gn
+#svn export https://github.com/immortalwrt/packages/trunk/devel/gn
+svn export https://github.com/kenzok8/wall/trunk/gn
 svn export https://github.com/kenzok8/small-package/trunk/luci-app-bypass
 
 sed -i \

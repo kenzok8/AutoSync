@@ -51,47 +51,21 @@ jobs:
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
 
-    - name: Extract PLUGIN_VERSION
-      run: |
-        PLUGIN_VERSIONS=()
-        for file in $(find . -type f -name Makefile); do
-          version=$(grep -E 'PKG_(BASE_)?VERSION\s*?:=' $file | awk -F '[:=]' '{print $2}')
-          if [ -n "$version" ]; then
-            PLUGIN_NAME=$(basename $(dirname $file))
-            PLUGIN_VERSIONS+=("$PLUGIN_NAME: update to $version")
-          fi
-        done
-
-        # Combine versions into a single string
-        PLUGIN_VERSION="${PLUGIN_VERSIONS[*]}"
-        echo "PLUGIN_VERSION=$PLUGIN_VERSION" >> $GITHUB_ENV
-
-    - name: Debug PLUGIN_VERSION
-      run: echo "PLUGIN_VERSION is $PLUGIN_VERSION"
-
-    - name: Create commitmessage.txt
-      run: echo "Program Name: Update to Version $PLUGIN_VERSION" > commitmessage.txt
-
-    - name: Set commit message
-      id: commit_message_step
-      run: |
-        echo 'commit_message<<EOF' >> $GITHUB_ENV
-        cat commitmessage.txt >> $GITHUB_ENV
-        echo 'EOF' >> $GITHUB_ENV
-
-    - name: Debug Commit Message
-      run: echo "Commit Message is ${{ steps.commit_message_step.outputs.commit_message }}"
-
-    - name: Commit and Push
+    - name: Upload
+      env: 
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
-        git add .
-        git commit -m "${{ steps.commit_message_step.outputs.commit_message }}"
-        git push "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:${{matrix.target}}
+        if git status --porcelain | grep .; then
+          PLUGIN_VERSION=$(find . -type f -name Makefile -exec grep -E 'PKG_(BASE_)?VERSION\s*?:=' {} \; | awk -F '[:=]' '{print $2}')
+          git add .
+          git commit -m "Update to $PLUGIN_VERSION"  # 提交消息中包含版本号
+          git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:${{matrix.target}}
         else
           echo "nothing to commit"
           exit 0
         fi || exit 0
+
 
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@main

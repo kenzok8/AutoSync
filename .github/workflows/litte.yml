@@ -50,6 +50,7 @@ jobs:
         bash /$GITHUB_WORKSPACE/.github/diy/convert_translation.sh
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
+        $GITHUB_WORKSPACE/.github/diy/small.sh
 
     - name: Upload
       env: 
@@ -59,7 +60,7 @@ jobs:
         if git status --porcelain | grep .; then
           PLUGIN_VERSION=$(find . -type f -name Makefile -exec grep -E 'PKG_(BASE_)?VERSION\s*?:=' {} \; | awk -F '[:=]' '{print $2}')
           git add .
-          git commit -m "Update to $PLUGIN_VERSION"  # 提交消息中包含版本号
+          git commit -m "Update to $PLUGIN_VERSION"
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:${{matrix.target}}
         else
           echo "nothing to commit"

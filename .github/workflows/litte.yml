@@ -50,7 +50,6 @@ jobs:
         bash /$GITHUB_WORKSPACE/.github/diy/convert_translation.sh
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
-        $GITHUB_WORKSPACE/.github/diy/small.sh
 
     - name: Upload
       env: 

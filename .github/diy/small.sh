@@ -21,7 +21,7 @@ git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall2 passwall2 && 
 git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/{luci-app-ssr-plus,tuic-client} ./ ; rm -rf helloworld
 #svn export https://github.com/immortalwrt/packages/trunk/devel/gn
 svn export https://github.com/kenzok8/small-package/trunk/luci-app-bypass
-svn export https://github.com/xiaorouji/openwrt-passwall-packages/trunk/sing-box
+svn export https://github.com/xiaorouji/openwrt-passwall-packages/trunk/{sing-box,shadowsocks-rust}
 
 sed -i \
 -e 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' \

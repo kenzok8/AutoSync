@@ -14,7 +14,7 @@ function mvdir() {
 mv -n `find $1/* -maxdepth 0 -type d` ./
 rm -rf $1
 }
-git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/* ./ ; rm -rf {UnblockNeteaseMusic,adguardhome,alist,ddns-go,dockerd,filebrowser,gost,lucky,mosdns,sing-box,sagernet-core,smartdns,ucl,upx-static,upx} && rm -rf wall
+git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/* ./ ; rm -rf {UnblockNeteaseMusic,adguardhome,alist,ddns-go,dockerd,filebrowser,gost,lucky,mosdns,sing-box,sagernet-core,shadowsocks-rust,smartdns,ucl,upx-static,upx} && rm -rf wall
 git clone --depth 1 https://github.com/jerrykuku/luci-app-vssr
 git clone --depth 1 -b main https://github.com/xiaorouji/openwrt-passwall passwall1 && mv -n passwall1/luci-app-passwall  ./; rm -rf passwall1
 git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall2 passwall2 && mv -n passwall2/luci-app-passwall2 ./;rm -rf passwall2

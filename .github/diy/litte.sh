@@ -51,8 +51,8 @@ git clone --depth 1 https://github.com/vernesong/OpenClash && mv -n OpenClash/lu
 git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-atmaterial_new litte/luci-theme-tomato ./ ; rm -rf litte
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/UnblockNeteaseMusic wall/gost wall/smartdns wall/adguardhome wall/filebrowser ./ ; rm -rf wall
 #git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/luci-app-gost luci/applications/luci-app-filebrowser ./ ; rm -rf luci
+git clone --depth 1 https://github.com/kenzok78/luci-app-filebrowser
 svn export https://github.com/immortalwrt/luci/trunk/applications/luci-app-gost
-svn export https://github.com/immortalwrt/luci/branches/openwrt-18.06-k5.4/applications/luci-app-filebrowser
 svn export https://github.com/coolsnowwolf/luci/trunk/libs/luci-lib-ipkg
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/* ./ ; rm -rf wall
 git clone --depth 1 https://github.com/jerrykuku/luci-app-vssr

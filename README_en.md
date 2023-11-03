@@ -80,5 +80,5 @@ make menuconfig
 ![atmaterial](https://raw.githubusercontent.com/kenzok8/kenzok8/main/screenshot/sshot-12.jpg)
 ![atmaterial](https://raw.githubusercontent.com/kenzok8/kenzok8/main/screenshot/sshot-13.jpg)
 ![atmaterial](https://raw.githubusercontent.com/kenzok8/kenzok8/main/screenshot/sshot-14.jpg)
-![argonne](https://raw.githubusercontent.com/kenzok8/kenzok8/main/screenshot/sshot-1.png)
-![argonne](https://raw.githubusercontent.com/kenzok8/kenzok8/main/screenshot/sshot-2.png)
+![argone](https://raw.githubusercontent.com/kenzok8/kenzok8/main/screenshot/sshot-1.png)
+![argone](https://raw.githubusercontent.com/kenzok8/kenzok8/main/screenshot/sshot-2.png)

@@ -15,13 +15,13 @@ mv -n `find $1/* -maxdepth 0 -type d` ./
 rm -rf $1
 }
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/* ./ ; rm -rf {UnblockNeteaseMusic,adguardhome,alist,ddns-go,dockerd,filebrowser,gost,lucky,mosdns,sagernet-core,smartdns,ucl,upx-static,upx} && rm -rf wall
-git clone --depth 1 https://github.com/jerrykuku/luci-app-vssr
+#git clone --depth 1 https://github.com/jerrykuku/luci-app-vssr
 git clone --depth 1 -b main https://github.com/xiaorouji/openwrt-passwall passwall1 && mv -n passwall1/luci-app-passwall  ./; rm -rf passwall1
 git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall2 passwall2 && mv -n passwall2/luci-app-passwall2 ./;rm -rf passwall2
 git clone https://github.com/XiaoliChan/helloworld -b main && rm -rf helloworld/v2raya && mvdir helloworld
 #git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall-packages passwall-packages && mv -n passwall-packages/{sing-box,shadowsocks-rust} ./; rm -rf passwall-packages
 #svn export https://github.com/immortalwrt/packages/trunk/devel/gn
-svn export https://github.com/kenzok8/small-package/trunk/luci-app-bypass
+git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt-packages/luci-app-bypass ./ ; rm -rf openwrt-packages
 
 sed -i \
 -e 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' \

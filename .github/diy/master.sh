@@ -18,7 +18,7 @@ git clone --depth 1 https://github.com/sirpdboy/luci-app-lucky
 git clone --depth 1 https://github.com/kiddin9/luci-app-dnsfilter
 git clone --depth 1 https://github.com/yaof2/luci-app-ikoolproxy
 git clone --depth 1 https://github.com/ntlf9t/luci-app-easymesh
-git clone --depth 1 -b 18.06 https://github.com/tty228/luci-app-wechatpush
+git clone --depth 1 -b openwrt-18.06 https://github.com/tty228/luci-app-wechatpush
 git clone --depth 1 https://github.com/jerrykuku/luci-theme-argon
 git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config
 git clone --depth 1 https://github.com/sirpdboy/luci-app-advanced

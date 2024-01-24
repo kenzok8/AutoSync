@@ -62,7 +62,9 @@ git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall2 passwall2 && 
 git clone https://github.com/XiaoliChan/helloworld -b main && rm -rf helloworld/v2raya && mvdir helloworld
 #svn export https://github.com/immortalwrt/packages/trunk/devel/gn
 git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt-packages/luci-app-bypass ./ ; rm -rf openwrt-packages
-svn export https://github.com/xiaorouji/openwrt-passwall-packages/trunk/sing-box
+git clone --depth 1 https://github.com/immortalwrt/homeproxy
+git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/luci-app-gost luci/applications/luci-app-filebrowser luci/applications/luci-app-homeproxy ./ ; rm -rf luci
+#svn export https://github.com/xiaorouji/openwrt-passwall-packages/trunk/sing-box
 
 sed -i \
 -e 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' \

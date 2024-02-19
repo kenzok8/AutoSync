@@ -49,7 +49,7 @@ git clone --depth 1 https://github.com/sbwml/luci-app-alist openwrt-alist && mv 
 git clone --depth 1 https://github.com/sirpdboy/sirpdboy-package && mv -n sirpdboy-package/luci-app-dockerman ./ ; rm -rf sirpdboy-package
 git clone --depth 1 https://github.com/vernesong/OpenClash && mv -n OpenClash/luci-app-openclash ./; rm -rf OpenClash
 git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-atmaterial_new litte/luci-theme-tomato ./ ; rm -rf litte
-git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/UnblockNeteaseMusic wall/gost wall/smartdns wall/adguardhome wall/filebrowser ./ ; rm -rf wall
+git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/UnblockNeteaseMusic wall/ddns-go wall/gost wall/smartdns wall/adguardhome wall/filebrowser ./ ; rm -rf wall
 #git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/luci-app-gost luci/applications/luci-app-filebrowser ./ ; rm -rf luci
 svn export https://github.com/immortalwrt/luci/branches/openwrt-18.06-k5.4/applications/luci-app-filebrowser
 svn export https://github.com/immortalwrt/luci/trunk/applications/luci-app-gost

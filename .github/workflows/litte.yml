@@ -51,18 +51,13 @@ jobs:
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
 
-    - name: Get plugin version
-      id: get_version
-      run: |
-        cd $GITHUB_WORKSPACE/${{matrix.target}}
-        PLUGIN_VERSION=$(find . -type f -name Makefile -exec grep -E 'PKG_(BASE_)?VERSION\s*?:=' {} \; | awk -F '[:=]' '{print $2}')
-        echo "PLUGIN_VERSION=${PLUGIN_VERSION}" >> $GITHUB_ENV
-
     - name: Upload
       env: 
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
+        PLUGIN_VERSION=$(find . -type f -name Makefile -exec grep -E 'PKG_(BASE_)?VERSION\s*?:=' {} \; | awk -F '[:=]' '{print $2}')
+        echo "PLUGIN_VERSION=${PLUGIN_VERSION}" >> $GITHUB_ENV	
         if git status --porcelain | grep .; then
           PLUGIN_VERSION=$(echo "${{ env.PLUGIN_VERSION }}")
           git add .

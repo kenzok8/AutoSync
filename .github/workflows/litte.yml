@@ -56,7 +56,7 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         PLUGIN_VERSION=$(find . -type f -name Makefile -exec grep -E 'PKG_(BASE_)?VERSION\s*?:=' {} \; | awk -F '[:=]' '{print $2}')
-        echo "::set-output name=version::$PLUGIN_VERSION"
+        echo "PLUGIN_VERSION=${PLUGIN_VERSION}" >> $GITHUB_ENV
 
     - name: Upload
       env: 
@@ -64,7 +64,7 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         if git status --porcelain | grep .; then
-          PLUGIN_VERSION=$(echo "${{ steps.get_version.outputs.version }}")
+          PLUGIN_VERSION=$(echo "${{ env.PLUGIN_VERSION }}")
           git add .
           git commit -m "${{matrix.target}}: Update to $PLUGIN_VERSION"
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:${{matrix.target}}

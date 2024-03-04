@@ -57,7 +57,7 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         if git status --porcelain | grep .; then
-          Emoji=("🎉" "🤞" "✨" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "💐" "🌴" "🙈" "🤡" "🍡" "⛅" "🌈" "🔥" "🍂" "🌸" "🐌" "🌿" "🐤" "💦" "💤" "💭" "🍭")
+          Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
           git add .
           git commit -am "${Emoji[$[$RANDOM % ${#Emoji[@]}]]} update $(date +%Y-%m-%d" "%H:%M:%S)"
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master

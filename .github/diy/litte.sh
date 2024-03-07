@@ -61,7 +61,7 @@ git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/{luc
 #svn export https://github.com/immortalwrt/packages/trunk/devel/gn
 git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt-packages/luci-app-bypass ./ ; rm -rf openwrt-packages
 git clone --depth 1 https://github.com/immortalwrt/homeproxy
-git clone --depth 1 -b openwrt-18.06 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-filebrowser,luci-app-homeproxy} ./ ; rm -rf luci
+git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-filebrowser,luci-app-homeproxy} ./ ; rm -rf luci
 #svn export https://github.com/xiaorouji/openwrt-passwall-packages/trunk/sing-box
 
 sed -i \

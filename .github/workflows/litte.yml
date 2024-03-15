@@ -34,8 +34,8 @@ jobs:
 
     - name: Initialization environment
       run : |
-        git config --global user.email "kenzok8@users.noreply.github.com"
-        git config --global user.name "kenzok8"
+        git config --global user.email "actions@github.com"
+        git config --global user.name "action"
         sudo timedatectl set-timezone "Asia/Shanghai"
         
     - name: Clone packages

@@ -1,7 +1,7 @@
 diff --git a/luci-app-eqos/luasrc/controller/eqos.lua b/luci-app-eqos1/luasrc/controller/eqos.lua
 index a8aea86..d24a36f 100755
 --- a/luci-app-eqos/luasrc/controller/eqos.lua
-+++ b/luci-app-eqos1/luasrc/controller/eqos.lua
++++ b/luci-app-eqos/luasrc/controller/eqos.lua
 @@ -6,6 +6,5 @@ function index()
  	end
  	

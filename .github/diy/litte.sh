@@ -52,7 +52,8 @@ git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-a
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/UnblockNeteaseMusic wall/ddns-go wall/gost wall/smartdns wall/adguardhome wall/filebrowser ./ ; rm -rf wall
 #svn export https://github.com/coolsnowwolf/luci/trunk/libs/luci-lib-ipkg
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/* ./ ; rm -rf wall
-git clone --depth 1 https://github.com/jerrykuku/luci-app-vssr
+#git clone --depth 1 https://github.com/jerrykuku/luci-app-vssr
+git clone --depth 1 https://github.com/QiuSimons/luci-app-daed-next daed1 && mvdir daed1
 git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go ddnsgo && mv -n ddnsgo/luci-app-ddns-go ./; rm -rf ddnsgo
 git clone --depth 1 -b main https://github.com/xiaorouji/openwrt-passwall passwall1 && mv -n passwall1/luci-app-passwall  ./; rm -rf passwall1
 git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall2 passwall2 && mv -n passwall2/luci-app-passwall2 ./;rm -rf passwall2

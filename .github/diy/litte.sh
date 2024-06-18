@@ -37,7 +37,7 @@ git clone --depth 1 https://github.com/gngpp/luci-theme-design
 git clone --depth 1 https://github.com/gngpp/luci-app-design-config
 git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
 git clone --depth 1 https://github.com/Huangjoe123/luci-app-eqos
-git clone --depth 1 https://github.com/jerrykuku/lua-maxminddb
+#git clone --depth 1 https://github.com/jerrykuku/lua-maxminddb
 git clone --depth 1 https://github.com/sirpdboy/luci-app-partexp
 git clone --depth 1 -b master https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic
 git clone --depth 1 https://github.com/ophub/luci-app-amlogic amlogic && mv -n amlogic/luci-app-amlogic ./;rm -rf amlogic
@@ -62,6 +62,7 @@ git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/{luc
 git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt-packages/luci-app-bypass ./ ; rm -rf openwrt-packages
 git clone --depth 1 https://github.com/immortalwrt/homeproxy
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/net/{cdnspeedtest,daed} ./ ; rm -rf packages
+git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/lang/lua-maxminddb ./ ; rm -rf packages
 git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-daed,luci-app-gost,luci-app-filebrowser,luci-app-homeproxy} ./ ; rm -rf luci
 
 sed -i \

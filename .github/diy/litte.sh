@@ -23,11 +23,12 @@ git clone --depth 1 https://github.com/jerrykuku/luci-theme-argon
 git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config
 git clone --depth 1 https://github.com/sirpdboy/luci-app-advanced
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-opentopd
-git clone --depth 1 https://github.com/jefferymvp/luci-app-koolproxyR
+#git clone --depth 1 https://github.com/jefferymvp/luci-app-koolproxyR
 git clone --depth 1 https://github.com/hubbylei/luci-app-clash
 git clone --depth 1 https://github.com/derisamedia/luci-theme-alpha
 #git clone --depth 1 https://github.com/QiuSimons/openwrt-mos && mv -n openwrt-mos/*mosdns ./ ; rm -rf openwrt-mos
 git clone --depth 1 https://github.com/sbwml/luci-app-mosdns openwrt-mos && mv -n openwrt-mos/{*mosdns,v2dat} ./; rm -rf openwrt-mos
+git clone --depth 1 https://github.com/sbwml/luci-app-daed daed1 && mv -n daed/*daed ./; rm -rf daed1
 git clone --depth 1 https://github.com/kenzok8/luci-theme-ifit ifit && mv -n ifit/luci-theme-ifit ./;rm -rf ifit
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argone
 git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config
@@ -61,9 +62,9 @@ git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall2 passwall2 && 
 git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/{luci-app-ssr-plus,tuic-client,shadow-tls} ./ ; rm -rf helloworld
 git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt-packages/luci-app-bypass ./ ; rm -rf openwrt-packages
 git clone --depth 1 https://github.com/immortalwrt/homeproxy
-git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/net/{cdnspeedtest,daed} ./ ; rm -rf packages
+git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/net/{cdnspeedtest} ./ ; rm -rf packages
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/lang/lua-maxminddb ./ ; rm -rf packages
-git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-daed,luci-app-gost,luci-app-filebrowser,luci-app-homeproxy} ./ ; rm -rf luci
+git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-filebrowser,luci-app-homeproxy} ./ ; rm -rf luci
 
 sed -i \
 -e 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' \

@@ -33,6 +33,7 @@ git clone --depth 1 https://github.com/kenzok78/luci-theme-argone
 git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config
 git clone --depth 1 https://github.com/kenzok78/luci-app-adguardhome
 git clone --depth 1 https://github.com/kenzok78/luci-app-fileassistant
+git clone --depth 1 https://github.com/kenzok78/luci-app-filebrowser
 git clone --depth 1 https://github.com/gngpp/luci-theme-design
 git clone --depth 1 https://github.com/gngpp/luci-app-design-config
 git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
@@ -53,7 +54,7 @@ git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-a
 git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go ddnsgo && mv -n ddnsgo/luci-app-ddns-go ./; rm -rf ddnsgo
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/UnblockNeteaseMusic wall/ddns-go wall/gost wall/smartdns wall/adguardhome wall/filebrowser ./ ; rm -rf wall
 git clone --depth 1 https://github.com/immortalwrt/homeproxy
-git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-filebrowser,luci-app-homeproxy} ./ ; rm -rf luci
+git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-homeproxy} ./ ; rm -rf luci
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/lang/lua-maxminddb ./ ; rm -rf packages
 
 sed -i \

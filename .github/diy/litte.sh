@@ -66,7 +66,7 @@ git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt
 git clone --depth 1 https://github.com/immortalwrt/homeproxy luci-app-homeproxy
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/net/{cdnspeedtest} ./ ; rm -rf packages
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/lang/lua-maxminddb ./ ; rm -rf packages
-git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/luci-app-homeproxy ./ ; rm -rf luci
+git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/luci-app-gost ./ ; rm -rf luci
 #git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-homeproxy} ./ ; rm -rf luci
 
 sed -i \

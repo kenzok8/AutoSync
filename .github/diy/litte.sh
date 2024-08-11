@@ -63,10 +63,11 @@ git clone --depth 1 -b main https://github.com/xiaorouji/openwrt-passwall passwa
 git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall2 passwall2 && mv -n passwall2/luci-app-passwall2 ./;rm -rf passwall2
 git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/{luci-app-ssr-plus,tuic-client,shadow-tls} ./ ; rm -rf helloworld
 git clone --depth 1 https://github.com/kiddin9/openwrt-packages && mv -n openwrt-packages/luci-app-bypass ./ ; rm -rf openwrt-packages
-git clone --depth 1 https://github.com/immortalwrt/homeproxy
+git clone --depth 1 https://github.com/immortalwrt/homeproxy luci-app-homeproxy
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/net/{cdnspeedtest} ./ ; rm -rf packages
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/lang/lua-maxminddb ./ ; rm -rf packages
-git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-homeproxy} ./ ; rm -rf luci
+git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/luci-app-homeproxy ./ ; rm -rf luci
+#git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-homeproxy} ./ ; rm -rf luci
 
 sed -i \
 -e 's?include \.\./\.\./\(lang\|devel\)?include $(TOPDIR)/feeds/packages/\1?' \

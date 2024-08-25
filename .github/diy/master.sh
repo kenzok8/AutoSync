@@ -35,7 +35,7 @@ git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config
 git clone --depth 1 https://github.com/kenzok78/luci-app-adguardhome
 git clone --depth 1 https://github.com/kenzok78/luci-app-fileassistant
 git clone --depth 1 https://github.com/kenzok78/luci-app-filebrowser
-git clone --depth 1 https://github.com/gngpp/luci-theme-design
+git clone --depth 1 https://github.com/kenzok78/luci-theme-design
 git clone --depth 1 https://github.com/gngpp/luci-app-design-config
 git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
 git clone --depth 1 https://github.com/Huangjoe123/luci-app-eqos

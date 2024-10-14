@@ -65,7 +65,7 @@ git clone --depth 1 https://github.com/kiddin9/kwrt-packages && mv -n kwrt-packa
 git clone --depth 1 https://github.com/muink/luci-app-homeproxy
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/net/cdnspeedtest ./ ; rm -rf packages
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/lang/lua-maxminddb ./ ; rm -rf packages
-git clone --depth -b openwrt-18.06 https://github.com/immortalwrt/luci && luci/applications/{luci-app-gost,luci-app-filebrowser} ./ ; rm -rf luci
+git clone --depth -b openwrt-18.06 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-filebrowser} ./ ; rm -rf luci
 git clone --depth 1 https://github.com/morytyann/OpenWrt-mihomo OpenWrt-mihomo && mv -n OpenWrt-mihomo/*mihomo ./ ; rm -rf OpenWrt-mihomo
 #git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-homeproxy} ./ ; rm -rf luci
 #git clone --depth 1 https://github.com/jerrykuku/luci-app-vssr

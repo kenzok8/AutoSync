@@ -67,6 +67,7 @@ git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/ne
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/lang/lua-maxminddb ./ ; rm -rf packages
 git clone --depth 1 -b openwrt-18.06 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-filebrowser} ./ && rm -rf luci
 git clone --depth 1 https://github.com/morytyann/OpenWrt-mihomo OpenWrt-mihomo && mv -n OpenWrt-mihomo/*mihomo ./ ; rm -rf OpenWrt-mihomo
+git clone --depth 1 https://github.com/muink/openwrt-fchomo openwrt-fchomo && mv -n openwrt-fchomo/*homo ./ ; rm -rf openwrt-fchomo
 #git clone --depth 1 https://github.com/jerrykuku/luci-app-vssr
 #git clone --depth 1 https://github.com/immortalwrt/homeproxy luci-app-homeproxy
 #git clone --depth 1 https://github.com/jerrykuku/lua-maxminddb

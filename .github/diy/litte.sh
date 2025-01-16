@@ -63,14 +63,14 @@ git clone --depth 1 -b main https://github.com/xiaorouji/openwrt-passwall passwa
 git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall2 passwall2 && mv -n passwall2/luci-app-passwall2 ./;rm -rf passwall2
 git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/{luci-app-ssr-plus,tuic-client,shadow-tls} ./ ; rm -rf helloworld
 git clone --depth 1 https://github.com/kiddin9/kwrt-packages && mv -n kwrt-packages/luci-app-bypass ./ ; rm -rf kwrt-packages
-git clone --depth 1 https://github.com/muink/luci-app-homeproxy
+#git clone --depth 1 https://github.com/muink/luci-app-homeproxy
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/net/cdnspeedtest ./ ; rm -rf packages
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/lang/lua-maxminddb ./ ; rm -rf packages
 git clone --depth 1 -b openwrt-18.06 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-filebrowser} ./ && rm -rf luci
 git clone --depth 1 https://github.com/morytyann/OpenWrt-mihomo OpenWrt-mihomo && mv -n OpenWrt-mihomo/*mihomo ./ ; rm -rf OpenWrt-mihomo
 git clone --depth 1 https://github.com/muink/openwrt-fchomo openwrt-fchomo && mv -n openwrt-fchomo/*homo ./ ; rm -rf openwrt-fchomo
 #git clone --depth 1 https://github.com/jerrykuku/luci-app-vssr
-#git clone --depth 1 https://github.com/immortalwrt/homeproxy luci-app-homeproxy
+git clone --depth 1 https://github.com/immortalwrt/homeproxy luci-app-homeproxy
 #git clone --depth 1 https://github.com/jerrykuku/lua-maxminddb
 #svn export https://github.com/coolsnowwolf/luci/trunk/libs/luci-lib-ipkg
 

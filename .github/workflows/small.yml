@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/small.yml'
-      - 'small.sh'
+      - '.github/diy/small.sh'
   schedule:
     - cron: 0 */4 * * *
   repository_dispatch:
@@ -13,14 +13,14 @@ on:
       packages:
         description: 'packages'
         required: false
-        default: 'false'	
+        default: 'false'
 
 jobs:
   job_small:
     if: github.event.repository.owner.id == github.event.sender.id || ! github.event.sender.id
     runs-on: ubuntu-latest
 
-    name: Update small
+    name: Update small packages
     strategy:
       fail-fast: false
       matrix:
@@ -33,40 +33,120 @@ jobs:
         fetch-depth: 0
 
     - name: Initialization environment
-      run : |
+      run: |
         git config --global user.email "kenzok8@users.noreply.github.com"
         git config --global user.name "actions-user"
         sudo timedatectl set-timezone "Asia/Shanghai"
         
-    - name: Clone packages
+    - name: Clone target repository
       run: |
         cd $GITHUB_WORKSPACE
-        chmod +x .github/diy/small.sh
         git clone -b master https://github.com/kenzok8/small.git ${{matrix.target}}
-        cd ${{matrix.target}}
+        
+    - name: Backup version info
+      run: |
+        cd $GITHUB_WORKSPACE/${{matrix.target}}
+        # 备份现有版本信息（如果存在）
+        if [[ -d ".version_info" ]]; then
+          cp -r .version_info $GITHUB_WORKSPACE/backup_version_info
+        fi
+        
+    - name: Clean and prepare
+      run: |
+        cd $GITHUB_WORKSPACE/${{matrix.target}}
         git rm -r --cache * >/dev/null 2>&1 &
-        rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1
+        rm -rf `find ./* -maxdepth 0 -type d ! -name "commit" ! -name ".version_info"` >/dev/null 2>&1
+        
+    - name: Restore version info
+      run: |
+        cd $GITHUB_WORKSPACE/${{matrix.target}}
+        # 恢复版本信息
+        if [[ -d "$GITHUB_WORKSPACE/backup_version_info" ]]; then
+          cp -r $GITHUB_WORKSPACE/backup_version_info .version_info
+        fi
+        
+    - name: Update packages with version tracking
+      run: |
+        cd $GITHUB_WORKSPACE/${{matrix.target}}
+        # 使用增强的脚本
+        chmod +x $GITHUB_WORKSPACE/.github/diy/small.sh
         $GITHUB_WORKSPACE/.github/diy/small.sh
-        #patch -p1 < $GITHUB_WORKSPACE/.github/diy/homeproxy.patch
-        bash /$GITHUB_WORKSPACE/.github/diy/convert_translation.sh
-        bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
-        bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
+        
+        # 应用其他修改脚本
+        if [[ -f "$GITHUB_WORKSPACE/.github/diy/convert_translation.sh" ]]; then
+          bash $GITHUB_WORKSPACE/.github/diy/convert_translation.sh
+        fi
+        if [[ -f "$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh" ]]; then
+          bash $GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
+        fi
+        if [[ -f "$GITHUB_WORKSPACE/.github/diy/Modify.sh" ]]; then
+          bash $GITHUB_WORKSPACE/.github/diy/Modify.sh
+        fi
 
-    - name: Upload
+    - name: Generate commit message
+      id: commit-msg
+      run: |
+        cd $GITHUB_WORKSPACE/${{matrix.target}}
+        if [[ -f ".version_info/changes.txt" ]]; then
+          # 使用版本变化信息作为提交消息
+          commit_msg=$(cat .version_info/changes.txt | head -20)  # 限制长度避免过长
+          
+          # 如果没有实际更新，使用默认消息
+          if grep -q "No package updates" .version_info/changes.txt; then
+            commit_msg="packages: routine maintenance $(date '+%Y-%m-%d %H:%M:%S')"
+          else
+            # 添加日期信息
+            commit_msg="packages: $(date '+%Y-%m-%d %H:%M:%S')
+
+$commit_msg"
+          fi
+        else
+          commit_msg="packages: update $(date '+%Y-%m-%d %H:%M:%S')"
+        fi
+        
+        # 输出到GitHub Actions环境变量（处理多行）
+        echo "COMMIT_MSG<<EOF" >> $GITHUB_OUTPUT
+        echo "$commit_msg" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        
+        echo "Generated commit message:"
+        echo "$commit_msg"
+
+    - name: Upload with detailed commit message
       env: 
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         if git status --porcelain | grep .; then
           git add .
-          git commit -am "update $(date '+%Y-%m-%d %H:%M:%S')"
+          git commit -m "${{ steps.commit-msg.outputs.COMMIT_MSG }}"
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/small.git" HEAD:master
+          echo "✅ Successfully pushed with detailed version information"
         else
-          echo "nothing to commit"
+          echo "ℹ️  Nothing to commit - no changes detected"
           exit 0
         fi || exit 0
 
-    - name: Delete workflow runs
+    - name: Summary
+      if: always()
+      run: |
+        cd $GITHUB_WORKSPACE/${{matrix.target}}
+        echo "## Package Update Summary" >> $GITHUB_STEP_SUMMARY
+        if [[ -f ".version_info/changes.txt" ]]; then
+          echo "### Version Changes" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat .version_info/changes.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "### Repository Status" >> $GITHUB_STEP_SUMMARY
+        if git status --porcelain | grep -q .; then
+          echo "- ✅ Changes detected and committed" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "- ℹ️  No changes detected" >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Delete old workflow runs
       uses: Mattraks/delete-workflow-runs@main
       with:
         retain_days: 1

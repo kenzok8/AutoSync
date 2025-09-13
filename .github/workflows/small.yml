@@ -46,7 +46,6 @@ jobs:
     - name: Backup version info
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
-        # 备份现有版本信息（如果存在）
         if [[ -d ".version_info" ]]; then
           cp -r .version_info $GITHUB_WORKSPACE/backup_version_info
         fi
@@ -54,13 +53,12 @@ jobs:
     - name: Clean and prepare
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
-        git rm -r --cache * >/dev/null 2>&1 &
-        rm -rf `find ./* -maxdepth 0 -type d ! -name "commit" ! -name ".version_info"` >/dev/null 2>&1
+        git rm -r --cache * >/dev/null 2>&1 || true
+        rm -rf `find ./* -maxdepth 0 -type d ! -name "commit" ! -name ".version_info"` >/dev/null 2>&1 || true
         
     - name: Restore version info
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
-        # 恢复版本信息
         if [[ -d "$GITHUB_WORKSPACE/backup_version_info" ]]; then
           cp -r $GITHUB_WORKSPACE/backup_version_info .version_info
         fi
@@ -68,66 +66,66 @@ jobs:
     - name: Update packages with version tracking
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
-        # 使用增强的脚本
         chmod +x $GITHUB_WORKSPACE/.github/diy/small.sh
         $GITHUB_WORKSPACE/.github/diy/small.sh
         
-        # 应用其他修改脚本
+        # 应用其他修改脚本（如果存在）
         if [[ -f "$GITHUB_WORKSPACE/.github/diy/convert_translation.sh" ]]; then
-          bash $GITHUB_WORKSPACE/.github/diy/convert_translation.sh
+          bash $GITHUB_WORKSPACE/.github/diy/convert_translation.sh || true
         fi
         if [[ -f "$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh" ]]; then
-          bash $GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
+          bash $GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a || true
         fi
         if [[ -f "$GITHUB_WORKSPACE/.github/diy/Modify.sh" ]]; then
-          bash $GITHUB_WORKSPACE/.github/diy/Modify.sh
+          bash $GITHUB_WORKSPACE/.github/diy/Modify.sh || true
         fi
 
     - name: Generate commit message
-      id: commit-msg
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         if [[ -f ".version_info/changes.txt" ]]; then
-          # 使用版本变化信息作为提交消息
-          commit_msg=$(cat .version_info/changes.txt | head -20)  # 限制长度避免过长
+          echo "COMMIT_TITLE=packages: $(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
           
-          # 如果没有实际更新，使用默认消息
+          # 检查是否有实际更新
           if grep -q "No package updates" .version_info/changes.txt; then
-            commit_msg="packages: routine maintenance $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "COMMIT_BODY=Routine maintenance - no package updates" >> $GITHUB_ENV
           else
-            # 添加日期信息
-            commit_msg="packages: $(date '+%Y-%m-%d %H:%M:%S')
-
-$commit_msg"
+            # 读取变化信息并设置为环境变量
+            changes_content=$(cat .version_info/changes.txt | head -15)
+            echo "COMMIT_BODY<<EOF" >> $GITHUB_ENV
+            echo "$changes_content" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
           fi
         else
-          commit_msg="packages: update $(date '+%Y-%m-%d %H:%M:%S')"
+          echo "COMMIT_TITLE=packages: update $(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+          echo "COMMIT_BODY=Package updates completed" >> $GITHUB_ENV
         fi
-        
-        # 输出到GitHub Actions环境变量（处理多行）
-        echo "COMMIT_MSG<<EOF" >> $GITHUB_OUTPUT
-        echo "$commit_msg" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
-        
-        echo "Generated commit message:"
-        echo "$commit_msg"
 
-    - name: Upload with detailed commit message
+    - name: Commit and push changes
       env: 
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
-        if git status --porcelain | grep .; then
+        if git status --porcelain | grep -q .; then
           git add .
-          git commit -m "${{ steps.commit-msg.outputs.COMMIT_MSG }}"
+          
+          # 创建提交消息
+          if [[ -n "$COMMIT_BODY" && "$COMMIT_BODY" != "Package updates completed" ]]; then
+            # 有详细更新信息的提交
+            git commit -m "$COMMIT_TITLE" -m "$COMMIT_BODY"
+          else
+            # 简单提交
+            git commit -m "$COMMIT_TITLE"
+          fi
+          
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/small.git" HEAD:master
           echo "✅ Successfully pushed with detailed version information"
         else
           echo "ℹ️  Nothing to commit - no changes detected"
           exit 0
-        fi || exit 0
+        fi
 
-    - name: Summary
+    - name: Show summary
       if: always()
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}

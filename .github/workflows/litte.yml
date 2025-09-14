@@ -45,15 +45,7 @@ jobs:
         git clone -b master https://github.com/kenzok8/litte.git ${{matrix.target}}
         cd ${{matrix.target}}
         git rm -r --cache * >/dev/null 2>&1 &
-        rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1     
-        
-        # 创建版本追踪目录
-        mkdir -p /tmp/old_versions /tmp/new_versions
-        
-        # 保存现有版本信息（如果存在）
-        if [ -f "commit/versions.txt" ]; then
-          cp commit/versions.txt /tmp/old_versions/
-        fi
+        rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1
         
         $GITHUB_WORKSPACE/.github/diy/litte.sh
         #patch -p1 < $GITHUB_WORKSPACE/.github/diy/homeproxy.patch

@@ -127,38 +127,55 @@ jobs:
             random_emoji="${Emoji[$[$RANDOM % ${#Emoji[@]}]]}"
             
             if [ "$update_count" -eq 1 ]; then
-              # 单个更新，格式：包名 emoji update to 版本号
+              # 单个更新
               line=$(cat /tmp/commit_messages.txt)
               pkg_name=$(echo "$line" | cut -d':' -f1)
-              version_part=$(echo "$line" | cut -d':' -f2- | sed 's/^ update to //')
-              commit_msg="$pkg_name $random_emoji update to $version_part"
+              version_part=$(echo "$line" | cut -d':' -f2)
+              
+              if [ "$version_part" = "sync" ]; then
+                commit_msg="$pkg_name: sync upstream"
+              else
+                commit_msg="$pkg_name $random_emoji update to $version_part"
+              fi
             elif [ "$update_count" -le 3 ]; then
-              # 少量更新，格式：多个包名 emoji update
-              pkg_names=$(cut -d':' -f1 /tmp/commit_messages.txt | paste -sd ", ")
-              commit_msg="$pkg_names $random_emoji update"
+              # 少量更新，逐个处理
+              commit_parts=()
+              while IFS= read -r line; do
+                pkg_name=$(echo "$line" | cut -d':' -f1)
+                version_part=$(echo "$line" | cut -d':' -f2)
+                
+                if [ "$version_part" = "sync" ]; then
+                  commit_parts+=("$pkg_name: sync upstream")
+                else
+                  commit_parts+=("$pkg_name: update to $version_part")
+                fi
+              done < /tmp/commit_messages.txt
+              
+              # 用逗号和空格连接
+              commit_msg=$(IFS=', '; echo "${commit_parts[*]}")
             else
-              # 多个更新，格式：前几个包名 emoji update and X more
-              first_packages=$(head -3 /tmp/commit_messages.txt | cut -d':' -f1 | paste -sd ", ")
-              commit_msg="$first_packages $random_emoji update and $((update_count-3)) more"
+              # 多个更新，只显示前3个
+              first_parts=()
+              count=0
+              while IFS= read -r line && [ $count -lt 3 ]; do
+                pkg_name=$(echo "$line" | cut -d':' -f1)
+                version_part=$(echo "$line" | cut -d':' -f2)
+                
+                if [ "$version_part" = "sync" ]; then
+                  first_parts+=("$pkg_name: sync upstream")
+                else
+                  first_parts+=("$pkg_name: update to $version_part")
+                fi
+                count=$((count + 1))
+              done < /tmp/commit_messages.txt
+              
+              first_msg=$(IFS=', '; echo "${first_parts[*]}")
+              commit_msg="$first_msg and $((update_count-3)) more packages"
             fi
           else
-            # 如果没有检测到包更新信息，尝试获取一个主要包名
-            main_package=""
-            for dir in */; do
-              dir_name=$(basename "$dir")
-              if [[ "$dir_name" != "commit" ]] && [[ "$dir_name" != .* ]] && [ -d "$dir_name" ]; then
-                main_package="$dir_name"
-                break
-              fi
-            done
-            
+            # 如果没有检测到包更新信息，使用原来的随机 emoji
             Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
-            random_emoji="${Emoji[$[$RANDOM % ${#Emoji[@]}]]}"
-            if [ -n "$main_package" ]; then
-              commit_msg="$main_package $random_emoji update"
-            else
-              commit_msg="packages $random_emoji update"
-            fi
+            commit_msg="${Emoji[$[$RANDOM % ${#Emoji[@]}]]} update $(date +%Y-%m-%d" "%H:%M:%S)"
           fi
           
           git add .
@@ -169,7 +186,7 @@ jobs:
           
           # 显示所有更新信息
           if [ -f "/tmp/commit_messages.txt" ] && [ -s "/tmp/commit_messages.txt" ]; then
-            echo "所有检测到的更新:"
+            echo "所有检测到的变化:"
             cat /tmp/commit_messages.txt
           fi
         else

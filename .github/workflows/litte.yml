@@ -45,7 +45,9 @@ jobs:
         git clone -b master https://github.com/kenzok8/litte.git ${{matrix.target}}
         cd ${{matrix.target}}
         git rm -r --cache * >/dev/null 2>&1 &
-        rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1
+        rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1     
+        
+        # 不需要版本追踪，直接基于git变化检测
         
         $GITHUB_WORKSPACE/.github/diy/litte.sh
         #patch -p1 < $GITHUB_WORKSPACE/.github/diy/homeproxy.patch
@@ -114,20 +116,49 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         if git status --porcelain | grep .; then
-          # 读取版本更新信息
+          # 读取包更新信息生成提交消息
           commit_msg=""
           if [ -f "/tmp/commit_messages.txt" ] && [ -s "/tmp/commit_messages.txt" ]; then
-            # 如果有版本更新，使用具体的更新信息
-            commit_msg=$(head -1 /tmp/commit_messages.txt)
-            # 如果有多个更新，添加到描述中
+            # 统计更新数量
             update_count=$(wc -l < /tmp/commit_messages.txt)
-            if [ "$update_count" -gt 1 ]; then
-              commit_msg="$commit_msg (and $((update_count-1)) more updates)"
+            
+            # 选择随机 emoji
+            Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
+            random_emoji="${Emoji[$[$RANDOM % ${#Emoji[@]}]]}"
+            
+            if [ "$update_count" -eq 1 ]; then
+              # 单个更新，格式：包名 emoji update to 版本号
+              line=$(cat /tmp/commit_messages.txt)
+              pkg_name=$(echo "$line" | cut -d':' -f1)
+              version_part=$(echo "$line" | cut -d':' -f2- | sed 's/^ update to //')
+              commit_msg="$pkg_name $random_emoji update to $version_part"
+            elif [ "$update_count" -le 3 ]; then
+              # 少量更新，格式：多个包名 emoji update
+              pkg_names=$(cut -d':' -f1 /tmp/commit_messages.txt | paste -sd ", ")
+              commit_msg="$pkg_names $random_emoji update"
+            else
+              # 多个更新，格式：前几个包名 emoji update and X more
+              first_packages=$(head -3 /tmp/commit_messages.txt | cut -d':' -f1 | paste -sd ", ")
+              commit_msg="$first_packages $random_emoji update and $((update_count-3)) more"
             fi
           else
-            # 如果没有版本更新信息，使用原来的随机 emoji
+            # 如果没有检测到包更新信息，尝试获取一个主要包名
+            main_package=""
+            for dir in */; do
+              dir_name=$(basename "$dir")
+              if [[ "$dir_name" != "commit" ]] && [[ "$dir_name" != .* ]] && [ -d "$dir_name" ]; then
+                main_package="$dir_name"
+                break
+              fi
+            done
+            
             Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
-            commit_msg="${Emoji[$[$RANDOM % ${#Emoji[@]}]]} update $(date +%Y-%m-%d" "%H:%M:%S)"
+            random_emoji="${Emoji[$[$RANDOM % ${#Emoji[@]}]]}"
+            if [ -n "$main_package" ]; then
+              commit_msg="$main_package $random_emoji update"
+            else
+              commit_msg="packages $random_emoji update"
+            fi
           fi
           
           git add .
@@ -138,7 +169,7 @@ jobs:
           
           # 显示所有更新信息
           if [ -f "/tmp/commit_messages.txt" ] && [ -s "/tmp/commit_messages.txt" ]; then
-            echo "所有更新:"
+            echo "所有检测到的更新:"
             cat /tmp/commit_messages.txt
           fi
         else

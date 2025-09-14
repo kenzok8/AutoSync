@@ -46,11 +46,75 @@ jobs:
         cd ${{matrix.target}}
         git rm -r --cache * >/dev/null 2>&1 &
         rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1     
+        
+        # 创建版本追踪目录
+        mkdir -p /tmp/old_versions /tmp/new_versions
+        
+        # 保存现有版本信息（如果存在）
+        if [ -f "commit/versions.txt" ]; then
+          cp commit/versions.txt /tmp/old_versions/
+        fi
+        
         $GITHUB_WORKSPACE/.github/diy/litte.sh
         #patch -p1 < $GITHUB_WORKSPACE/.github/diy/homeproxy.patch
         bash /$GITHUB_WORKSPACE/.github/diy/convert_translation.sh
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
+
+    - name: Generate version info and commit message
+      run: |
+        cd $GITHUB_WORKSPACE/${{matrix.target}}
+        
+        # 生成新的版本信息
+        mkdir -p commit
+        > commit/versions.txt
+        > /tmp/commit_messages.txt
+        
+        # 遍历所有 Makefile 提取版本信息
+        for makefile in $(find . -name "Makefile" -path "./*/Makefile"); do
+          pkg_dir=$(dirname "$makefile")
+          pkg_name=$(basename "$pkg_dir")
+          
+          # 跳过一些特殊目录
+          if [[ "$pkg_name" == "." ]] || [[ "$pkg_name" == "commit" ]]; then
+            continue
+          fi
+          
+          # 提取版本信息
+          version=$(grep -E "^PKG_VERSION|^PKG_SOURCE_VERSION" "$makefile" | head -1 | cut -d'=' -f2 | tr -d ' ')
+          source_url=$(grep -E "^PKG_SOURCE_URL" "$makefile" | cut -d'=' -f2- | tr -d ' ')
+          
+          if [ -n "$version" ]; then
+            echo "$pkg_name=$version" >> commit/versions.txt
+            echo "Package: $pkg_name, Version: $version"
+          fi
+        done
+        
+        # 比较版本变化
+        if [ -f "/tmp/old_versions/versions.txt" ]; then
+          echo "检测版本变化..."
+          while IFS='=' read -r pkg old_ver; do
+            if [ -n "$pkg" ] && [ -n "$old_ver" ]; then
+              new_ver=$(grep "^$pkg=" commit/versions.txt | cut -d'=' -f2)
+              if [ -n "$new_ver" ] && [ "$old_ver" != "$new_ver" ]; then
+                echo "$pkg: update to $new_ver" >> /tmp/commit_messages.txt
+                echo "版本更新: $pkg $old_ver -> $new_ver"
+              fi
+            fi
+          done < /tmp/old_versions/versions.txt
+          
+          # 检查新增的包
+          while IFS='=' read -r pkg new_ver; do
+            if [ -n "$pkg" ] && [ -n "$new_ver" ]; then
+              if ! grep -q "^$pkg=" /tmp/old_versions/versions.txt 2>/dev/null; then
+                echo "$pkg: add version $new_ver" >> /tmp/commit_messages.txt
+                echo "新增包: $pkg $new_ver"
+              fi
+            fi
+          done < commit/versions.txt
+        else
+          echo "首次运行，生成初始版本信息"
+        fi
 
     - name: Upload
       env: 
@@ -58,10 +122,33 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         if git status --porcelain | grep .; then
-          Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
+          # 读取版本更新信息
+          commit_msg=""
+          if [ -f "/tmp/commit_messages.txt" ] && [ -s "/tmp/commit_messages.txt" ]; then
+            # 如果有版本更新，使用具体的更新信息
+            commit_msg=$(head -1 /tmp/commit_messages.txt)
+            # 如果有多个更新，添加到描述中
+            update_count=$(wc -l < /tmp/commit_messages.txt)
+            if [ "$update_count" -gt 1 ]; then
+              commit_msg="$commit_msg (and $((update_count-1)) more updates)"
+            fi
+          else
+            # 如果没有版本更新信息，使用原来的随机 emoji
+            Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
+            commit_msg="${Emoji[$[$RANDOM % ${#Emoji[@]}]]} update $(date +%Y-%m-%d" "%H:%M:%S)"
+          fi
+          
           git add .
-          git commit -am "${Emoji[$[$RANDOM % ${#Emoji[@]}]]} update $(date +%Y-%m-%d" "%H:%M:%S)"
+          git commit -m "$commit_msg"
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
+          
+          echo "提交信息: $commit_msg"
+          
+          # 显示所有更新信息
+          if [ -f "/tmp/commit_messages.txt" ] && [ -s "/tmp/commit_messages.txt" ]; then
+            echo "所有更新:"
+            cat /tmp/commit_messages.txt
+          fi
         else
           echo "nothing to commit"
           exit 0

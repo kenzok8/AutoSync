@@ -179,7 +179,7 @@ jobs:
               done < /tmp/commit_messages.txt
               
               first_msg=$(printf "%s, " "${first_parts[@]}")
-              first_msg=${first_msg%, }  # 移除最后的逗号和空格
+              first_msg=${first_msg%, }
               commit_msg="$first_msg and $((update_count-3)) more packages"
             fi
             

@@ -118,9 +118,15 @@ jobs:
         if git status --porcelain | grep .; then
           # 读取包更新信息生成提交消息
           commit_msg=""
+          
+          echo "开始生成提交信息..."
           if [ -f "/tmp/commit_messages.txt" ] && [ -s "/tmp/commit_messages.txt" ]; then
+            echo "发现包更新信息文件"
+            cat /tmp/commit_messages.txt
+            
             # 统计更新数量
             update_count=$(wc -l < /tmp/commit_messages.txt)
+            echo "检测到 $update_count 个包变化"
             
             # 选择随机 emoji
             Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
@@ -128,9 +134,11 @@ jobs:
             
             if [ "$update_count" -eq 1 ]; then
               # 单个更新
-              line=$(cat /tmp/commit_messages.txt)
+              line=$(head -1 /tmp/commit_messages.txt)
               pkg_name=$(echo "$line" | cut -d':' -f1)
               version_part=$(echo "$line" | cut -d':' -f2)
+              
+              echo "处理单个包: $pkg_name, 版本部分: $version_part"
               
               if [ "$version_part" = "sync" ]; then
                 commit_msg="$pkg_name: sync upstream"
@@ -147,12 +155,13 @@ jobs:
                 if [ "$version_part" = "sync" ]; then
                   commit_parts+=("$pkg_name: sync upstream")
                 else
-                  commit_parts+=("$pkg_name: update to $version_part")
+                  commit_parts+=("$pkg_name $random_emoji update to $version_part")
                 fi
               done < /tmp/commit_messages.txt
               
               # 用逗号和空格连接
-              commit_msg=$(IFS=', '; echo "${commit_parts[*]}")
+              commit_msg=$(printf "%s, " "${commit_parts[@]}")
+              commit_msg=${commit_msg%, }  # 移除最后的逗号和空格
             else
               # 多个更新，只显示前3个
               first_parts=()
@@ -169,20 +178,25 @@ jobs:
                 count=$((count + 1))
               done < /tmp/commit_messages.txt
               
-              first_msg=$(IFS=', '; echo "${first_parts[*]}")
+              first_msg=$(printf "%s, " "${first_parts[@]}")
+              first_msg=${first_msg%, }  # 移除最后的逗号和空格
               commit_msg="$first_msg and $((update_count-3)) more packages"
             fi
+            
+            echo "生成的提交信息: $commit_msg"
           else
+            echo "没有找到包更新信息，使用默认格式"
             # 如果没有检测到包更新信息，使用原来的随机 emoji
             Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
             commit_msg="${Emoji[$[$RANDOM % ${#Emoji[@]}]]} update $(date +%Y-%m-%d" "%H:%M:%S)"
           fi
           
+          echo "最终提交信息: $commit_msg"
           git add .
           git commit -m "$commit_msg"
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
           
-          echo "提交信息: $commit_msg"
+          echo "提交完成: $commit_msg"
           
           # 显示所有更新信息
           if [ -f "/tmp/commit_messages.txt" ] && [ -s "/tmp/commit_messages.txt" ]; then

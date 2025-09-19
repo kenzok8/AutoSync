@@ -92,6 +92,8 @@ git clone --depth 1 https://github.com/nikkinikki-org/OpenWrt-nikki OpenWrt-nikk
 git clone --depth 1 https://github.com/muink/openwrt-fchomo openwrt-fchomo && mv -n openwrt-fchomo/*homo ./ ; rm -rf openwrt-fchomo
 git clone --depth 1 https://github.com/immortalwrt/homeproxy luci-app-homeproxynikki
 git clone --depth 1 https://github.com/muink/openwrt-fchomo openwrt-fchomo && mv -n openwrt-fchomo/*homo ./ ; rm -rf openwrt-fchomo
+git clone --depth 1 https://github.com/sirpdboy/luci-theme-kucat openwrt-kucat && mv -n openwrt-kucat/luci-theme-kucat ./ ; rm -rf openwrt-kucat
+git clone --depth 1 https://github.com/AngelaCooljx/luci-theme-material3
 git clone --depth 1 https://github.com/immortalwrt/homeproxy luci-app-homeproxy
 extract_version "https://github.com/immortalwrt/homeproxy" "luci-app-homeproxy" "homeproxy"
 

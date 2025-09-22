@@ -90,21 +90,12 @@ git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/la
 git clone --depth 1 https://github.com/nikkinikki-org/OpenWrt-momo OpenWrt-momo && mv -n OpenWrt-momo/*momo ./ ; rm -rf OpenWrt-momo
 git clone --depth 1 https://github.com/nikkinikki-org/OpenWrt-nikki OpenWrt-nikki && mv -n OpenWrt-nikki/*nikki ./ ; rm -rf OpenWrt-nikki
 git clone --depth 1 https://github.com/muink/openwrt-fchomo openwrt-fchomo && mv -n openwrt-fchomo/*homo ./ ; rm -rf openwrt-fchomo
-git clone --depth 1 https://github.com/immortalwrt/homeproxy luci-app-homeproxynikki
+git clone --depth 1 https://github.com/immortalwrt/homeproxy luci-app-homeproxy
 git clone --depth 1 https://github.com/muink/openwrt-fchomo openwrt-fchomo && mv -n openwrt-fchomo/*homo ./ ; rm -rf openwrt-fchomo
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-kucat openwrt-kucat && mv -n openwrt-kucat/luci-theme-kucat ./ ; rm -rf openwrt-kucat
 git clone --depth 1 https://github.com/AngelaCooljx/luci-theme-material3
 git clone --depth 1 https://github.com/sbwml/luci-app-openlist2 oplist && mvdir oplist
-git clone --depth 1 https://github.com/immortalwrt/homeproxy luci-app-homeproxy
-git clone --depth 1 https://github.com/immortalwrt/luci \
-&& mv -n luci/applications/{ \
-luci-app-argon-config,luci-app-adblock-fast,luci-app-dae,luci-app-daed, \
-luci-app-diskman,luci-app-filebrowser-go,luci-app-filebrowser,luci-app-gost, \
-luci-app-microsocks,luci-app-openlist,luci-app-qbittorrent,luci-app-snmpd, \
-luci-app-smartdns,luci-app-transmission,luci-app-v2raya,luci-app-watchcat, \
-luci-app-eoip \
-} ./ \
-&& rm -rf luci
+git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-argon-config,luci-app-adblock-fast,luci-app-dae,luci-app-daed,luci-app-diskman,luci-app-filebrowser-go,luci-app-filebrowser,luci-app-gost,luci-app-microsocks,luci-app-openlist,luci-app-qbittorrent,luci-app-snmpd,luci-app-smartdns,luci-app-transmission,luci-app-v2raya,luci-app-watchcat,luci-app-eoip} ./ ; rm -rf luci
 
 echo "完成包克隆和版本提取"
 

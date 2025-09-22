@@ -48,7 +48,6 @@ git clone --depth 1 https://github.com/yaof2/luci-app-ikoolproxy
 git clone --depth 1 https://github.com/ntlf9t/luci-app-easymesh
 git clone --depth 1 -b openwrt-18.06 https://github.com/tty228/luci-app-wechatpush
 git clone --depth 1 https://github.com/jerrykuku/luci-theme-argon
-#git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config
 git clone --depth 1 https://github.com/sirpdboy/luci-app-advanced
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-opentopd
 git clone --depth 1 https://github.com/hubbylei/luci-app-clash
@@ -63,7 +62,7 @@ git clone --depth 1 https://github.com/kenzok78/luci-app-adguardhome
 git clone --depth 1 https://github.com/kenzok78/luci-app-fileassistant
 git clone --depth 1 https://github.com/kenzok78/luci-theme-design
 git clone --depth 1 https://github.com/kenzok78/luci-app-guest-wifi
-git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
+#git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
 git clone --depth 1 https://github.com/Huangjoe123/luci-app-eqos
 git clone --depth 1 https://github.com/sirpdboy/luci-app-partexp
 git clone --depth 1 -b master https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic
@@ -95,7 +94,7 @@ git clone --depth 1 https://github.com/muink/openwrt-fchomo openwrt-fchomo && mv
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-kucat openwrt-kucat && mv -n openwrt-kucat/luci-theme-kucat ./ ; rm -rf openwrt-kucat
 git clone --depth 1 https://github.com/AngelaCooljx/luci-theme-material3
 git clone --depth 1 https://github.com/sbwml/luci-app-openlist2 oplist && mvdir oplist
-git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-argon-config,luci-app-adblock-fast,luci-app-dae,luci-app-daed,luci-app-diskman,luci-app-filebrowser-go,luci-app-filebrowser,luci-app-gost,luci-app-microsocks,luci-app-openlist,luci-app-qbittorrent,luci-app-snmpd,luci-app-smartdns,luci-app-transmission,luci-app-v2raya,luci-app-watchcat,luci-app-eoip} ./ ; rm -rf luci
+git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-argon-config,luci-app-adblock-fast,luci-app-dae,luci-app-daed,luci-app-diskman,luci-app-filebrowser-go,luci-app-filebrowser,luci-app-gost,luci-app-microsocks,luci-app-openlist,luci-app-qbittorrent,luci-app-snmpd,luci-app-smartdns,luci-app-transmission,luci-app-v2raya,luci-app-watchcat,luci-app-eoip，luci-app-smartdns} ./ ; rm -rf luci
 
 echo "完成包克隆和版本提取"
 

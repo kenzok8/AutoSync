@@ -97,18 +97,11 @@ git clone --depth 1 https://github.com/AngelaCooljx/luci-theme-material3
 git clone --depth 1 https://github.com/sbwml/luci-app-openlist2 oplist && mvdir oplist
 git clone --depth 1 https://github.com/immortalwrt/homeproxy luci-app-homeproxy
 git clone --depth 1 https://github.com/immortalwrt/luci \
-&& mv -n luci/applications/{ \
-luci-app-argon-config,luci-app-adblock-fast,  \
-luci-app-dae,luci-app-daed,luci-app-diskman,  \
-luci-app-filebrowser-go, luci-app-filebrowser, \
-luci-app-gost, luci-app-microsocks,\
-luci-app-openlist,luci-app-qbittorrent, \
-luci-app-snmpd, luci-app-smartdns\
-luci-app-transmission, luci-app-v2raya,\
-luci-app-watchcat, luci-app-eoip,\
-} ./ \
+&& mv -n luci/applications/{luci-app-argon-config,luci-app-adblock-fast,luci-app-dae,luci-app-daed,luci-app-diskman \
+luci-app-filebrowser-go, luci-app-filebrowser,luci-app-gost, luci-app-microsocks \
+luci-app-openlist,luci-app-qbittorrent,luci-app-snmpd, luci-app-smartdns \
+luci-app-transmission, luci-app-v2raya,luci-app-watchcat, luci-app-eoip } ./ \
 && rm -rf luci
-extract_version "https://github.com/immortalwrt/homeproxy" "luci-app-homeproxy" "homeproxy"
 
 echo "完成包克隆和版本提取"
 

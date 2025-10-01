@@ -16,13 +16,13 @@ rm -rf $1
 }
 git clone --depth 1 https://github.com/sirpdboy/luci-app-lucky
 git clone --depth 1 https://github.com/kiddin9/luci-app-dnsfilter
-git clone --depth 1 https://github.com/yaof2/luci-app-ikoolproxy
+#git clone --depth 1 https://github.com/yaof2/luci-app-ikoolproxy
 git clone --depth 1 https://github.com/ntlf9t/luci-app-easymesh
 git clone --depth 1 -b openwrt-18.06 https://github.com/tty228/luci-app-wechatpush
 #git clone --depth 1 -b 18.06 https://github.com/jerrykuku/luci-theme-argon
 git clone --depth 1 https://github.com/jerrykuku/luci-theme-argon
 git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config
-git clone --depth 1 https://github.com/sirpdboy/luci-app-advanced
+#git clone --depth 1 https://github.com/sirpdboy/luci-app-advanced
 git clone --depth 1 https://github.com/AngelaCooljx/luci-theme-material3
 #git clone --depth 1 https://github.com/jefferymvp/luci-app-koolproxyR
 #git clone --depth 1 https://github.com/hubbylei/luci-app-clash
@@ -48,7 +48,7 @@ git clone --depth 1 https://github.com/ophub/luci-app-amlogic amlogic && mv -n a
 git clone --depth 1 https://github.com/linkease/istore && mv -n istore/luci/* ./; rm -rf istore
 git clone --depth 1 https://github.com/linkease/nas-packages && mv -n nas-packages/network/services/{ddnsto,quickstart} ./; rm -rf nas-packages
 git clone --depth 1 https://github.com/linkease/nas-packages-luci && mv -n nas-packages-luci/luci/{luci-app-ddnsto,luci-app-istorex,luci-app-quickstart} ./; rm -rf nas-packages-luci
-git clone --depth 1 https://github.com/messense/aliyundrive-webdav aliyundrive && mv -n aliyundrive/openwrt/* ./ ; rm -rf aliyundrive
+#git clone --depth 1 https://github.com/messense/aliyundrive-webdav aliyundrive && mv -n aliyundrive/openwrt/* ./ ; rm -rf aliyundrive
 git clone --depth 1 https://github.com/honwen/luci-app-aliddns
 #git clone --depth 1 https://github.com/sbwml/luci-app-alist openwrt-alist && mv -n openwrt-alist/alist ./ ; rm -rf openwrt-alist
 git clone --depth 1 https://github.com/sbwml/luci-app-openlist2 oplist && mvdir oplist

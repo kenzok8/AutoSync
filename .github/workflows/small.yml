@@ -57,6 +57,7 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         : > /tmp/commit_messages.txt
+        : > /tmp/commit_messages_version.txt
         : > /tmp/commit_links.txt
 
         get_make_var() {
@@ -129,6 +130,7 @@ jobs:
 
           if [ -n "$new_ver" ] && [ "$new_ver" != "$old_ver" ]; then
             echo "$pkg: update to $new_ver" >> /tmp/commit_messages.txt
+            echo "$pkg: update to $new_ver" >> /tmp/commit_messages_version.txt
             append_last_commit_link "$pkg" "$repo" "$new_src_ver"
             continue
           fi
@@ -163,17 +165,21 @@ jobs:
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         if git status --porcelain | grep .; then
           commit_body=""
-          if [ -s /tmp/commit_messages.txt ]; then
-            count=$(wc -l < /tmp/commit_messages.txt)
+          msg_source="/tmp/commit_messages.txt"
+          if [ -s /tmp/commit_messages_version.txt ]; then
+            msg_source="/tmp/commit_messages_version.txt"
+          fi
+          if [ -s "$msg_source" ]; then
+            count=$(wc -l < "$msg_source")
             join_with_comma() {
               awk 'BEGIN{ORS=""} {if (NR>1) printf(", "); printf("%s", $0)} END{print ""}' "$1"
             }
             if [ "$count" -eq 1 ]; then
-              commit_msg=$(head -1 /tmp/commit_messages.txt)
+              commit_msg=$(head -1 "$msg_source")
             elif [ "$count" -le 3 ]; then
-              commit_msg=$(join_with_comma /tmp/commit_messages.txt)
+              commit_msg=$(join_with_comma "$msg_source")
             else
-              head -3 /tmp/commit_messages.txt > /tmp/commit_messages_top3.txt
+              head -3 "$msg_source" > /tmp/commit_messages_top3.txt
               first3=$(join_with_comma /tmp/commit_messages_top3.txt)
               commit_msg="$first3 and $((count-3)) more packages"
             fi

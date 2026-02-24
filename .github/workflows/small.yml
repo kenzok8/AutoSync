@@ -159,12 +159,16 @@ jobs:
           commit_body=""
           if [ -s /tmp/commit_messages.txt ]; then
             count=$(wc -l < /tmp/commit_messages.txt)
+            join_with_comma() {
+              awk 'BEGIN{ORS=""} {if (NR>1) printf(", "); printf("%s", $0)} END{print ""}' "$1"
+            }
             if [ "$count" -eq 1 ]; then
               commit_msg=$(head -1 /tmp/commit_messages.txt)
             elif [ "$count" -le 3 ]; then
-              commit_msg=$(paste -sd ', ' /tmp/commit_messages.txt)
+              commit_msg=$(join_with_comma /tmp/commit_messages.txt)
             else
-              first3=$(head -3 /tmp/commit_messages.txt | paste -sd ', ' -)
+              head -3 /tmp/commit_messages.txt > /tmp/commit_messages_top3.txt
+              first3=$(join_with_comma /tmp/commit_messages_top3.txt)
               commit_msg="$first3 and $((count-3)) more packages"
             fi
           else

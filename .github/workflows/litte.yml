@@ -1,4 +1,4 @@
-﻿name: litte
+name: litte
 
 on:
   push:
@@ -13,7 +13,7 @@ on:
       packages:
         description: 'packages'
         required: false
-        default: 'false'	
+        default: 'false'
 
 jobs:
   job_litte:
@@ -25,7 +25,7 @@ jobs:
       fail-fast: false
       matrix:
         target: [master]
-        
+
     steps:
     - name: Checkout
       uses: actions/checkout@main
@@ -33,176 +33,148 @@ jobs:
         fetch-depth: 0
 
     - name: Initialization environment
-      run : |
+      run: |
         git config --global user.email "actions@github.com"
         git config --global user.name "action"
         sudo timedatectl set-timezone "Asia/Shanghai"
-        
+
     - name: Clone packages
       run: |
         cd $GITHUB_WORKSPACE
         chmod +x .github/diy/${{matrix.target}}.sh
         git clone -b master https://github.com/kenzok8/litte.git ${{matrix.target}}
         cd ${{matrix.target}}
+        mkdir -p /tmp/old_meta
+        if [ -f commit/package_meta.tsv ]; then
+          cp -f commit/package_meta.tsv /tmp/old_meta/package_meta.tsv
+        fi
         git rm -r --cache * >/dev/null 2>&1 &
-        rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1     
-        
-        # 不需要版本追踪，直接基于git变化检测
-        
+        rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1
+
         $GITHUB_WORKSPACE/.github/diy/litte.sh
-        #patch -p1 < $GITHUB_WORKSPACE/.github/diy/homeproxy.patch
         bash /$GITHUB_WORKSPACE/.github/diy/convert_translation.sh
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
 
-    - name: Generate version info and commit message
+    - name: Generate commit messages by package version/upstream
+      env:
+        GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
-        
-        # 生成新的版本信息
         mkdir -p commit
-        > commit/versions.txt
-        > /tmp/commit_messages.txt
-        
-        # 遍历所有 Makefile 提取版本信息
-        for makefile in $(find . -name "Makefile" -path "./*/Makefile"); do
-          pkg_dir=$(dirname "$makefile")
-          pkg_name=$(basename "$pkg_dir")
-          
-          # 跳过一些特殊目录
-          if [[ "$pkg_name" == "." ]] || [[ "$pkg_name" == "commit" ]]; then
-            continue
+        : > commit/package_meta.tsv
+        : > /tmp/commit_messages.txt
+
+        get_make_var() {
+          local file="$1"
+          local var="$2"
+          awk -v v="$var" '
+            $0 ~ "^" v "[[:space:]]*:=" || $0 ~ "^" v "[[:space:]]*=" {
+              sub("^[^=]*=", "", $0)
+              gsub(/^[[:space:]]+|[[:space:]]+$/, "", $0)
+              print $0
+              exit
+            }
+          ' "$file"
+        }
+
+        github_repo_from_url() {
+          local url="$1"
+          echo "$url" | sed -nE 's#.*github.com[:/]+([^/]+/[^/.]+)(\.git)?.*#\1#p' | head -1
+        }
+
+        fetch_upstream_subject() {
+          local repo="$1"
+          local sha="$2"
+          local msg=""
+
+          if [ -n "$repo" ] && [ -n "$sha" ] && [ ${#sha} -ge 7 ]; then
+            msg=$(gh api "repos/${repo}/commits/${sha}" --jq '.commit.message' 2>/dev/null | head -1)
           fi
-          
-          # 提取版本信息
-          version=$(grep -E "^PKG_VERSION|^PKG_SOURCE_VERSION" "$makefile" | head -1 | cut -d'=' -f2 | tr -d ' ')
-          source_url=$(grep -E "^PKG_SOURCE_URL" "$makefile" | cut -d'=' -f2- | tr -d ' ')
-          
-          if [ -n "$version" ]; then
-            echo "$pkg_name=$version" >> commit/versions.txt
-            echo "Package: $pkg_name, Version: $version"
+          if [ -z "$msg" ] && [ -n "$repo" ]; then
+            msg=$(gh api "repos/${repo}/commits?per_page=1" --jq '.[0].commit.message' 2>/dev/null | head -1)
           fi
+
+          echo "$msg" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//'
+        }
+
+        for makefile in ./*/Makefile; do
+          [ -f "$makefile" ] || continue
+          pkg=$(basename "$(dirname "$makefile")")
+          [ "$pkg" = "commit" ] && continue
+
+          pkg_version=$(get_make_var "$makefile" "PKG_VERSION")
+          [ -z "$pkg_version" ] && pkg_version=$(get_make_var "$makefile" "LUCI_VERSION")
+          src_version=$(get_make_var "$makefile" "PKG_SOURCE_VERSION")
+          src_url=$(get_make_var "$makefile" "PKG_SOURCE_URL")
+          repo=$(github_repo_from_url "$src_url")
+
+          version_field="$pkg_version"
+          [ -z "$version_field" ] && version_field="sync"
+
+          upstream_subject=""
+          if [ "$version_field" = "sync" ]; then
+            upstream_subject=$(fetch_upstream_subject "$repo" "$src_version")
+          fi
+
+          echo "$pkg|$version_field|$upstream_subject" >> commit/package_meta.tsv
         done
-        
-        # 比较版本变化
-        if [ -f "/tmp/old_versions/versions.txt" ]; then
-          echo "检测版本变化..."
-          while IFS='=' read -r pkg old_ver; do
-            if [ -n "$pkg" ] && [ -n "$old_ver" ]; then
-              new_ver=$(grep "^$pkg=" commit/versions.txt | cut -d'=' -f2)
-              if [ -n "$new_ver" ] && [ "$old_ver" != "$new_ver" ]; then
+
+        if [ -f /tmp/old_meta/package_meta.tsv ]; then
+          while IFS='|' read -r pkg new_ver new_subject; do
+            [ -n "$pkg" ] || continue
+            old_line=$(grep -E "^${pkg}\|" /tmp/old_meta/package_meta.tsv || true)
+
+            if [ -z "$old_line" ]; then
+              if [ "$new_ver" != "sync" ]; then
+                echo "$pkg: add $new_ver" >> /tmp/commit_messages.txt
+              elif [ -n "$new_subject" ]; then
+                echo "$pkg: $new_subject" >> /tmp/commit_messages.txt
+              else
+                echo "$pkg: sync upstream" >> /tmp/commit_messages.txt
+              fi
+              continue
+            fi
+
+            old_ver=$(echo "$old_line" | cut -d'|' -f2)
+            old_subject=$(echo "$old_line" | cut -d'|' -f3-)
+
+            if [ "$old_ver" != "$new_ver" ] || [ "$old_subject" != "$new_subject" ]; then
+              if [ "$new_ver" != "sync" ]; then
                 echo "$pkg: update to $new_ver" >> /tmp/commit_messages.txt
-                echo "版本更新: $pkg $old_ver -> $new_ver"
+              elif [ -n "$new_subject" ]; then
+                echo "$pkg: $new_subject" >> /tmp/commit_messages.txt
+              else
+                echo "$pkg: sync upstream" >> /tmp/commit_messages.txt
               fi
             fi
-          done < /tmp/old_versions/versions.txt
-          
-          # 检查新增的包
-          while IFS='=' read -r pkg new_ver; do
-            if [ -n "$pkg" ] && [ -n "$new_ver" ]; then
-              if ! grep -q "^$pkg=" /tmp/old_versions/versions.txt 2>/dev/null; then
-                echo "$pkg: add version $new_ver" >> /tmp/commit_messages.txt
-                echo "新增包: $pkg $new_ver"
-              fi
-            fi
-          done < commit/versions.txt
-        else
-          echo "首次运行，生成初始版本信息"
+          done < commit/package_meta.tsv
         fi
 
     - name: Upload
-      env: 
+      env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         if git status --porcelain | grep .; then
-          # 读取包更新信息生成提交消息
-          commit_msg=""
-          
-          echo "开始生成提交信息..."
-          if [ -f "/tmp/commit_messages.txt" ] && [ -s "/tmp/commit_messages.txt" ]; then
-            echo "发现包更新信息文件"
-            cat /tmp/commit_messages.txt
-            
-            # 统计更新数量
-            update_count=$(wc -l < /tmp/commit_messages.txt)
-            echo "检测到 $update_count 个包变化"
-            
-            # 选择随机 emoji
-            Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
-            random_emoji="${Emoji[$[$RANDOM % ${#Emoji[@]}]]}"
-            
-            if [ "$update_count" -eq 1 ]; then
-              # 单个更新
-              line=$(head -1 /tmp/commit_messages.txt)
-              pkg_name=$(echo "$line" | cut -d':' -f1)
-              version_part=$(echo "$line" | cut -d':' -f2)
-              
-              echo "处理单个包: $pkg_name, 版本部分: $version_part"
-              
-              if [ "$version_part" = "sync" ]; then
-                commit_msg="$pkg_name: sync upstream"
-              else
-                commit_msg="$pkg_name $random_emoji update to $version_part"
-              fi
-            elif [ "$update_count" -le 3 ]; then
-              # 少量更新，逐个处理
-              commit_parts=()
-              while IFS= read -r line; do
-                pkg_name=$(echo "$line" | cut -d':' -f1)
-                version_part=$(echo "$line" | cut -d':' -f2)
-                
-                if [ "$version_part" = "sync" ]; then
-                  commit_parts+=("$pkg_name: sync upstream")
-                else
-                  commit_parts+=("$pkg_name $random_emoji update to $version_part")
-                fi
-              done < /tmp/commit_messages.txt
-              
-              # 用逗号和空格连接
-              commit_msg=$(printf "%s, " "${commit_parts[@]}")
-              commit_msg=${commit_msg%, }  # 移除最后的逗号和空格
+          if [ -s /tmp/commit_messages.txt ]; then
+            count=$(wc -l < /tmp/commit_messages.txt)
+            if [ "$count" -eq 1 ]; then
+              commit_msg=$(head -1 /tmp/commit_messages.txt)
+            elif [ "$count" -le 3 ]; then
+              commit_msg=$(paste -sd ', ' /tmp/commit_messages.txt)
             else
-              # 多个更新，只显示前3个
-              first_parts=()
-              count=0
-              while IFS= read -r line && [ $count -lt 3 ]; do
-                pkg_name=$(echo "$line" | cut -d':' -f1)
-                version_part=$(echo "$line" | cut -d':' -f2)
-                
-                if [ "$version_part" = "sync" ]; then
-                  first_parts+=("$pkg_name: sync upstream")
-                else
-                  first_parts+=("$pkg_name: update to $version_part")
-                fi
-                count=$((count + 1))
-              done < /tmp/commit_messages.txt
-              
-              first_msg=$(printf "%s, " "${first_parts[@]}")
-              first_msg=${first_msg%, }
-              commit_msg="$first_msg and $((update_count-3)) more packages"
+              first3=$(head -3 /tmp/commit_messages.txt | paste -sd ', ' -)
+              commit_msg="$first3 and $((count-3)) more packages"
             fi
-            
-            echo "生成的提交信息: $commit_msg"
           else
-            echo "没有找到包更新信息，使用默认格式"
-            # 如果没有检测到包更新信息，使用原来的随机 emoji
-            Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
-            commit_msg="${Emoji[$[$RANDOM % ${#Emoji[@]}]]} update $(date +%Y-%m-%d" "%H:%M:%S)"
+            commit_msg="sync: misc package updates"
           fi
-          
-          echo "最终提交信息: $commit_msg"
+
           git add .
           git commit -m "$commit_msg"
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
-          
           echo "提交完成: $commit_msg"
-          
-          # 显示所有更新信息
-          if [ -f "/tmp/commit_messages.txt" ] && [ -s "/tmp/commit_messages.txt" ]; then
-            echo "所有检测到的变化:"
-            cat /tmp/commit_messages.txt
-          fi
         else
           echo "nothing to commit"
           exit 0

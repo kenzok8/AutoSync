@@ -58,6 +58,7 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         : > /tmp/commit_messages.txt
+        : > /tmp/commit_links.txt
 
         get_make_var() {
           local file="$1"
@@ -92,6 +93,15 @@ jobs:
           echo "$msg" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//'
         }
 
+        append_last_commit_link() {
+          local pkg="$1"
+          local repo="$2"
+          local sha="$3"
+          if [ -n "$pkg" ] && [ -n "$repo" ] && [ -n "$sha" ] && [ ${#sha} -ge 7 ]; then
+            echo "$pkg|https://github.com/${repo}/commit/${sha}" >> /tmp/commit_links.txt
+          fi
+        }
+
         # 仅分析发生变化的 Makefile 对应包
         changed_makefiles=$(git diff --name-only HEAD -- . ':(exclude).github/**' | grep -E '^[^/]+/Makefile$' || true)
 
@@ -103,6 +113,7 @@ jobs:
           [ -z "$new_ver" ] && new_ver=$(get_make_var "$makefile" "LUCI_VERSION")
           new_src_ver=$(get_make_var "$makefile" "PKG_SOURCE_VERSION")
           new_src_url=$(get_make_var "$makefile" "PKG_SOURCE_URL")
+          repo=$(github_repo_from_url "$new_src_url")
 
           old_ver=""
           old_src_ver=""
@@ -114,11 +125,11 @@ jobs:
 
           if [ -n "$new_ver" ] && [ "$new_ver" != "$old_ver" ]; then
             echo "$pkg: update to $new_ver" >> /tmp/commit_messages.txt
+            append_last_commit_link "$pkg" "$repo" "$new_src_ver"
             continue
           fi
 
           # 无版本号或版本未变时，尝试使用上游提交标题
-          repo=$(github_repo_from_url "$new_src_url")
           upstream_subject=""
           if [ -n "$new_src_ver" ] && [ "$new_src_ver" != "$old_src_ver" ]; then
             upstream_subject=$(fetch_upstream_subject "$repo" "$new_src_ver")
@@ -130,6 +141,7 @@ jobs:
           else
             echo "$pkg: sync upstream" >> /tmp/commit_messages.txt
           fi
+          append_last_commit_link "$pkg" "$repo" "$new_src_ver"
         done
 
         # 如果没有 Makefile 变化但仓库有变更，按目录兜底生成
@@ -148,6 +160,7 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         if git status --porcelain | grep .; then
+          commit_body=""
           if [ -s /tmp/commit_messages.txt ]; then
             count=$(wc -l < /tmp/commit_messages.txt)
             if [ "$count" -eq 1 ]; then
@@ -162,8 +175,23 @@ jobs:
             commit_msg="sync: misc package updates"
           fi
 
+          if [ -s /tmp/commit_links.txt ]; then
+            sort -u /tmp/commit_links.txt > /tmp/commit_links_unique.txt
+            while IFS='|' read -r pkg url; do
+              [ -n "$pkg" ] && [ -n "$url" ] || continue
+              if [ -n "$commit_body" ]; then
+                commit_body="$commit_body\n\n"
+              fi
+              commit_body="$commit_body$pkg:\nlast commit: $url"
+            done < /tmp/commit_links_unique.txt
+          fi
+
           git add .
-          git commit -m "$commit_msg"
+          if [ -n "$commit_body" ]; then
+            git commit -m "$commit_msg" -m "$(printf '%b' "$commit_body")"
+          else
+            git commit -m "$commit_msg"
+          fi
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
           echo "提交完成: $commit_msg"
         else

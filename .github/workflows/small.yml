@@ -13,7 +13,7 @@ on:
       packages:
         description: 'packages'
         required: false
-        default: 'false'	
+        default: 'false'
 
 jobs:
   job_small:
@@ -44,6 +44,10 @@ jobs:
         chmod +x .github/diy/small.sh
         git clone -b master https://github.com/kenzok8/small.git ${{matrix.target}}
         cd ${{matrix.target}}
+        mkdir -p /tmp/old_meta
+        if [ -f commit/package_meta.tsv ]; then
+          cp -f commit/package_meta.tsv /tmp/old_meta/package_meta.tsv
+        fi
         git rm -r --cache * >/dev/null 2>&1 &
         rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1
         $GITHUB_WORKSPACE/.github/diy/small.sh
@@ -52,6 +56,103 @@ jobs:
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
 
+    - name: Generate commit messages by package version/upstream
+      env:
+        GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      run: |
+        cd $GITHUB_WORKSPACE/${{matrix.target}}
+        mkdir -p commit
+        : > commit/package_meta.tsv
+        : > /tmp/commit_messages.txt
+
+        get_make_var() {
+          local file="$1"
+          local var="$2"
+          awk -v v="$var" '
+            $0 ~ "^" v "[[:space:]]*:=" || $0 ~ "^" v "[[:space:]]*=" {
+              sub("^[^=]*=", "", $0)
+              gsub(/^[[:space:]]+|[[:space:]]+$/, "", $0)
+              print $0
+              exit
+            }
+          ' "$file"
+        }
+
+        github_repo_from_url() {
+          local url="$1"
+          echo "$url" | sed -nE 's#.*github.com[:/]+([^/]+/[^/.]+)(\.git)?.*#\1#p' | head -1
+        }
+
+        fetch_upstream_subject() {
+          local repo="$1"
+          local sha="$2"
+          local msg=""
+
+          if [ -n "$repo" ] && [ -n "$sha" ] && [ ${#sha} -ge 7 ]; then
+            msg=$(gh api "repos/${repo}/commits/${sha}" --jq '.commit.message' 2>/dev/null | head -1)
+          fi
+
+          if [ -z "$msg" ] && [ -n "$repo" ]; then
+            msg=$(gh api "repos/${repo}/commits?per_page=1" --jq '.[0].commit.message' 2>/dev/null | head -1)
+          fi
+
+          echo "$msg" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//'
+        }
+
+        for makefile in ./*/Makefile; do
+          [ -f "$makefile" ] || continue
+          pkg=$(basename "$(dirname "$makefile")")
+
+          pkg_version=$(get_make_var "$makefile" "PKG_VERSION")
+          [ -z "$pkg_version" ] && pkg_version=$(get_make_var "$makefile" "LUCI_VERSION")
+          src_version=$(get_make_var "$makefile" "PKG_SOURCE_VERSION")
+          src_url=$(get_make_var "$makefile" "PKG_SOURCE_URL")
+          repo=$(github_repo_from_url "$src_url")
+
+          version_field="$pkg_version"
+          if [ -z "$version_field" ]; then
+            version_field="sync"
+          fi
+
+          upstream_subject=""
+          if [ "$version_field" = "sync" ]; then
+            upstream_subject=$(fetch_upstream_subject "$repo" "$src_version")
+          fi
+
+          echo "$pkg|$version_field|$upstream_subject" >> commit/package_meta.tsv
+        done
+
+        if [ -f /tmp/old_meta/package_meta.tsv ]; then
+          while IFS='|' read -r pkg new_ver new_subject; do
+            [ -n "$pkg" ] || continue
+            old_line=$(grep -E "^${pkg}\|" /tmp/old_meta/package_meta.tsv || true)
+
+            if [ -z "$old_line" ]; then
+              if [ "$new_ver" != "sync" ]; then
+                echo "$pkg: add $new_ver" >> /tmp/commit_messages.txt
+              elif [ -n "$new_subject" ]; then
+                echo "$pkg: $new_subject" >> /tmp/commit_messages.txt
+              else
+                echo "$pkg: sync upstream" >> /tmp/commit_messages.txt
+              fi
+              continue
+            fi
+
+            old_ver=$(echo "$old_line" | cut -d'|' -f2)
+            old_subject=$(echo "$old_line" | cut -d'|' -f3-)
+
+            if [ "$old_ver" != "$new_ver" ] || [ "$old_subject" != "$new_subject" ]; then
+              if [ "$new_ver" != "sync" ]; then
+                echo "$pkg: update to $new_ver" >> /tmp/commit_messages.txt
+              elif [ -n "$new_subject" ]; then
+                echo "$pkg: $new_subject" >> /tmp/commit_messages.txt
+              else
+                echo "$pkg: sync upstream" >> /tmp/commit_messages.txt
+              fi
+            fi
+          done < commit/package_meta.tsv
+        fi
+
     - name: Upload
       env: 
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
@@ -59,7 +160,20 @@ jobs:
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         if git status --porcelain | grep .; then
           git add .
-          git commit -am "update $(date '+%Y-%m-%d %H:%M:%S')"
+          if [ -s /tmp/commit_messages.txt ]; then
+            count=$(wc -l < /tmp/commit_messages.txt)
+            if [ "$count" -eq 1 ]; then
+              commit_msg=$(head -1 /tmp/commit_messages.txt)
+            elif [ "$count" -le 3 ]; then
+              commit_msg=$(paste -sd ', ' /tmp/commit_messages.txt)
+            else
+              first3=$(head -3 /tmp/commit_messages.txt | paste -sd ', ' -)
+              commit_msg="$first3 and $((count-3)) more packages"
+            fi
+          else
+            commit_msg="sync: misc package updates"
+          fi
+          git commit -m "$commit_msg"
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/small.git" HEAD:master
         else
           echo "nothing to commit"

@@ -176,48 +176,62 @@ jobs:
         cd $GITHUB_WORKSPACE/${{matrix.target}}
 
         if git status --porcelain | grep .; then
-          commit_body=""
-          msg_source="/tmp/commit_messages.txt"
-          if [ -s /tmp/commit_messages_version.txt ]; then
-            msg_source="/tmp/commit_messages_version.txt"
-          fi
-          if [ -s "$msg_source" ]; then
-            count=$(wc -l < "$msg_source")
-            join_with_comma() {
-              awk 'BEGIN{ORS=""} {if (NR>1) printf(", "); printf("%s", $0)} END{print ""}' "$1"
-            }
-            if [ "$count" -eq 1 ]; then
-              commit_msg=$(head -1 "$msg_source")
-            elif [ "$count" -le 3 ]; then
-              commit_msg=$(join_with_comma "$msg_source")
-            else
-              head -3 "$msg_source" > /tmp/commit_messages_top3.txt
-              first3=$(join_with_comma /tmp/commit_messages_top3.txt)
-              commit_msg="$first3 and $((count-3)) more packages"
-            fi
-          else
-            commit_msg="sync: misc package updates"
-          fi
+          Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
+          committed_any=0
 
-          if [ -s /tmp/commit_links.txt ]; then
-            sort -u /tmp/commit_links.txt > /tmp/commit_links_unique.txt
-            while IFS='|' read -r pkg url; do
-              [ -n "$pkg" ] && [ -n "$url" ] || continue
-              if [ -n "$commit_body" ]; then
-                commit_body="$commit_body\n\n"
-              fi
-              commit_body="$commit_body$pkg:\nlast commit: $url"
-            done < /tmp/commit_links_unique.txt
-          fi
+          changed_pkgs=$(git diff --name-only HEAD -- . ':(exclude).github/**' | awk -F/ 'NF>1{print $1}' | sort -u)
+
+          for pkg in $changed_pkgs; do
+            [ -n "$pkg" ] || continue
+            [ -d "$pkg" ] || continue
+
+            git add "$pkg"
+            if git diff --cached --quiet; then
+              continue
+            fi
+
+            commit_msg=""
+            if [ -s /tmp/commit_messages_version.txt ]; then
+              commit_msg=$(awk -v p="$pkg" '$0 ~ ("^[^[:space:]]+[[:space:]]+" p ": ") {print; exit}' /tmp/commit_messages_version.txt)
+            fi
+            if [ -z "$commit_msg" ] && [ -s /tmp/commit_messages.txt ]; then
+              commit_msg=$(awk -v p="$pkg" '$0 ~ ("^[^[:space:]]+[[:space:]]+" p ": ") {print; exit}' /tmp/commit_messages.txt)
+            fi
+            if [ -z "$commit_msg" ]; then
+              random_emoji="${Emoji[$((RANDOM % ${#Emoji[@]}))]}"
+              commit_msg="$random_emoji $pkg: sync upstream"
+            fi
+
+            url=""
+            if [ -s /tmp/commit_links.txt ]; then
+              url=$(awk -F'|' -v p="$pkg" '$1==p{print $2; exit}' /tmp/commit_links.txt)
+            fi
+
+            if [ -n "$url" ]; then
+              git commit -m "$commit_msg" -m "$(printf '%b' "$pkg:\nlast commit: $url")"
+            else
+              git commit -m "$commit_msg"
+            fi
+
+            committed_any=1
+            echo "✅ 提交完成: $commit_msg"
+          done
 
           git add .
-          if [ -n "$commit_body" ]; then
-            git commit -m "$commit_msg" -m "$(printf '%b' "$commit_body")"
-          else
-            git commit -m "$commit_msg"
+          if ! git diff --cached --quiet; then
+            random_emoji="${Emoji[$((RANDOM % ${#Emoji[@]}))]}"
+            fallback_msg="$random_emoji sync: misc package updates"
+            git commit -m "$fallback_msg"
+            committed_any=1
+            echo "✅ 提交完成: $fallback_msg"
           fi
-          git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
-          echo "✅ 提交完成: $commit_msg"
+
+          if [ "$committed_any" -eq 1 ]; then
+            git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
+          else
+            echo "ℹ️ nothing to commit"
+            exit 0
+          fi
         else
           echo "ℹ️ nothing to commit"
           exit 0

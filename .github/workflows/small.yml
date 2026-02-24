@@ -83,11 +83,17 @@ jobs:
           local msg=""
 
           if [ -n "$repo" ] && [ -n "$sha" ] && [ ${#sha} -ge 7 ]; then
-            msg=$(gh api "repos/${repo}/commits/${sha}" --jq '.commit.message' 2>/dev/null | head -1)
+            msg=$(gh api "repos/${repo}/commits/${sha}" --jq '.commit.message // empty' 2>/dev/null || true)
           fi
           if [ -z "$msg" ] && [ -n "$repo" ]; then
-            msg=$(gh api "repos/${repo}/commits?per_page=1" --jq '.[0].commit.message' 2>/dev/null | head -1)
+            msg=$(gh api "repos/${repo}/commits?per_page=1" --jq '.[0].commit.message // empty' 2>/dev/null || true)
           fi
+
+          case "$msg" in
+            ""|null|"{"*|"["*|*"API rate limit exceeded"*|*"Bad credentials"*)
+              msg=""
+              ;;
+          esac
 
           echo "$msg" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//'
         }

@@ -44,12 +44,8 @@ jobs:
         chmod +x .github/diy/${{matrix.target}}.sh
         git clone -b master https://github.com/kenzok8/litte.git ${{matrix.target}}
         cd ${{matrix.target}}
-        mkdir -p /tmp/old_meta
-        if [ -f commit/package_meta.tsv ]; then
-          cp -f commit/package_meta.tsv /tmp/old_meta/package_meta.tsv
-        fi
         git rm -r --cache * >/dev/null 2>&1 &
-        rm -rf `find ./* -maxdepth 0 -type d ! -name "commit"` >/dev/null 2>&1
+        rm -rf `find ./* -maxdepth 0 -type d` >/dev/null 2>&1
 
         $GITHUB_WORKSPACE/.github/diy/litte.sh
         bash /$GITHUB_WORKSPACE/.github/diy/convert_translation.sh
@@ -61,8 +57,6 @@ jobs:
         GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
-        mkdir -p commit
-        : > commit/package_meta.tsv
         : > /tmp/commit_messages.txt
 
         get_make_var() {
@@ -98,57 +92,54 @@ jobs:
           echo "$msg" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//'
         }
 
-        for makefile in ./*/Makefile; do
+        # 仅分析发生变化的 Makefile 对应包
+        changed_makefiles=$(git diff --name-only HEAD -- . ':(exclude).github/**' | grep -E '^[^/]+/Makefile$' || true)
+
+        for makefile in $changed_makefiles; do
           [ -f "$makefile" ] || continue
           pkg=$(basename "$(dirname "$makefile")")
-          [ "$pkg" = "commit" ] && continue
 
-          pkg_version=$(get_make_var "$makefile" "PKG_VERSION")
-          [ -z "$pkg_version" ] && pkg_version=$(get_make_var "$makefile" "LUCI_VERSION")
-          src_version=$(get_make_var "$makefile" "PKG_SOURCE_VERSION")
-          src_url=$(get_make_var "$makefile" "PKG_SOURCE_URL")
-          repo=$(github_repo_from_url "$src_url")
+          new_ver=$(get_make_var "$makefile" "PKG_VERSION")
+          [ -z "$new_ver" ] && new_ver=$(get_make_var "$makefile" "LUCI_VERSION")
+          new_src_ver=$(get_make_var "$makefile" "PKG_SOURCE_VERSION")
+          new_src_url=$(get_make_var "$makefile" "PKG_SOURCE_URL")
 
-          version_field="$pkg_version"
-          [ -z "$version_field" ] && version_field="sync"
-
-          upstream_subject=""
-          if [ "$version_field" = "sync" ]; then
-            upstream_subject=$(fetch_upstream_subject "$repo" "$src_version")
+          old_ver=""
+          old_src_ver=""
+          if git cat-file -e "HEAD:${makefile}" 2>/dev/null; then
+            old_content=$(git show "HEAD:${makefile}")
+            old_ver=$(printf '%s\n' "$old_content" | awk '/^PKG_VERSION[[:space:]]*:=|^PKG_VERSION[[:space:]]*=|^LUCI_VERSION[[:space:]]*:=|^LUCI_VERSION[[:space:]]*=/{sub("^[^=]*=","",$0);gsub(/^[[:space:]]+|[[:space:]]+$/,"",$0);print;exit}')
+            old_src_ver=$(printf '%s\n' "$old_content" | awk '/^PKG_SOURCE_VERSION[[:space:]]*:=|^PKG_SOURCE_VERSION[[:space:]]*=/{sub("^[^=]*=","",$0);gsub(/^[[:space:]]+|[[:space:]]+$/,"",$0);print;exit}')
           fi
 
-          echo "$pkg|$version_field|$upstream_subject" >> commit/package_meta.tsv
+          if [ -n "$new_ver" ] && [ "$new_ver" != "$old_ver" ]; then
+            echo "$pkg: update to $new_ver" >> /tmp/commit_messages.txt
+            continue
+          fi
+
+          # 无版本号或版本未变时，尝试使用上游提交标题
+          repo=$(github_repo_from_url "$new_src_url")
+          upstream_subject=""
+          if [ -n "$new_src_ver" ] && [ "$new_src_ver" != "$old_src_ver" ]; then
+            upstream_subject=$(fetch_upstream_subject "$repo" "$new_src_ver")
+          fi
+          [ -z "$upstream_subject" ] && upstream_subject=$(fetch_upstream_subject "$repo" "$new_src_ver")
+
+          if [ -n "$upstream_subject" ]; then
+            echo "$pkg: $upstream_subject" >> /tmp/commit_messages.txt
+          else
+            echo "$pkg: sync upstream" >> /tmp/commit_messages.txt
+          fi
         done
 
-        if [ -f /tmp/old_meta/package_meta.tsv ]; then
-          while IFS='|' read -r pkg new_ver new_subject; do
-            [ -n "$pkg" ] || continue
-            old_line=$(grep -E "^${pkg}\|" /tmp/old_meta/package_meta.tsv || true)
-
-            if [ -z "$old_line" ]; then
-              if [ "$new_ver" != "sync" ]; then
-                echo "$pkg: add $new_ver" >> /tmp/commit_messages.txt
-              elif [ -n "$new_subject" ]; then
-                echo "$pkg: $new_subject" >> /tmp/commit_messages.txt
-              else
-                echo "$pkg: sync upstream" >> /tmp/commit_messages.txt
-              fi
-              continue
-            fi
-
-            old_ver=$(echo "$old_line" | cut -d'|' -f2)
-            old_subject=$(echo "$old_line" | cut -d'|' -f3-)
-
-            if [ "$old_ver" != "$new_ver" ] || [ "$old_subject" != "$new_subject" ]; then
-              if [ "$new_ver" != "sync" ]; then
-                echo "$pkg: update to $new_ver" >> /tmp/commit_messages.txt
-              elif [ -n "$new_subject" ]; then
-                echo "$pkg: $new_subject" >> /tmp/commit_messages.txt
-              else
-                echo "$pkg: sync upstream" >> /tmp/commit_messages.txt
-              fi
-            fi
-          done < commit/package_meta.tsv
+        # 如果没有 Makefile 变化但仓库有变更，按目录兜底生成
+        if [ ! -s /tmp/commit_messages.txt ] && git diff --name-only HEAD -- . ':(exclude).github/**' | grep . >/dev/null 2>&1; then
+          git diff --name-only HEAD -- . ':(exclude).github/**' \
+            | awk -F/ 'NF>1{print $1}' \
+            | sort -u \
+            | while read -r pkg; do
+                [ -n "$pkg" ] && [ "$pkg" != "commit" ] && echo "$pkg: sync upstream" >> /tmp/commit_messages.txt
+              done
         fi
 
     - name: Upload

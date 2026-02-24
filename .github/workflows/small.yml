@@ -163,6 +163,10 @@ jobs:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
+
+        Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
+        random_emoji="${Emoji[$((RANDOM % ${#Emoji[@]}))]}"
+
         if git status --porcelain | grep .; then
           commit_body=""
           msg_source="/tmp/commit_messages.txt"
@@ -200,9 +204,9 @@ jobs:
 
           git add .
           if [ -n "$commit_body" ]; then
-            git commit -m "$commit_msg" -m "$(printf '%b' "$commit_body")"
+            git commit -m "$random_emoji $commit_msg" -m "$(printf '%b' "$commit_body")"
           else
-            git commit -m "$commit_msg"
+            git commit -m "$random_emoji $commit_msg"
           fi
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/small.git" HEAD:master
         else

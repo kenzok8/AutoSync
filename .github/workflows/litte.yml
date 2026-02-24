@@ -110,6 +110,11 @@ jobs:
           fi
         }
 
+        random_emoji() {
+          local Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
+          echo "${Emoji[$((RANDOM % ${#Emoji[@]}))]}"
+        }
+
         # 仅分析发生变化的 Makefile 对应包
         changed_makefiles=$(git diff --name-only HEAD -- . ':(exclude).github/**' | grep -E '^[^/]+/Makefile$' || true)
 
@@ -132,8 +137,9 @@ jobs:
           fi
 
           if [ -n "$new_ver" ] && [ "$new_ver" != "$old_ver" ]; then
-            echo "$pkg: update to $new_ver" >> /tmp/commit_messages.txt
-            echo "$pkg: update to $new_ver" >> /tmp/commit_messages_version.txt
+            msg="$(random_emoji) $pkg: update to $new_ver"
+            echo "$msg" >> /tmp/commit_messages.txt
+            echo "$msg" >> /tmp/commit_messages_version.txt
             append_last_commit_link "$pkg" "$repo" "$new_src_ver"
             continue
           fi
@@ -146,9 +152,9 @@ jobs:
           [ -z "$upstream_subject" ] && upstream_subject=$(fetch_upstream_subject "$repo" "$new_src_ver")
 
           if [ -n "$upstream_subject" ]; then
-            echo "$pkg: $upstream_subject" >> /tmp/commit_messages.txt
+            echo "$(random_emoji) $pkg: $upstream_subject" >> /tmp/commit_messages.txt
           else
-            echo "$pkg: sync upstream" >> /tmp/commit_messages.txt
+            echo "$(random_emoji) $pkg: sync upstream" >> /tmp/commit_messages.txt
           fi
           append_last_commit_link "$pkg" "$repo" "$new_src_ver"
         done
@@ -159,7 +165,7 @@ jobs:
             | awk -F/ 'NF>1{print $1}' \
             | sort -u \
             | while read -r pkg; do
-                [ -n "$pkg" ] && [ "$pkg" != "commit" ] && echo "$pkg: sync upstream" >> /tmp/commit_messages.txt
+                [ -n "$pkg" ] && [ "$pkg" != "commit" ] && echo "$(random_emoji) $pkg: sync upstream" >> /tmp/commit_messages.txt
               done
         fi
 
@@ -168,9 +174,6 @@ jobs:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
-
-        Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
-        random_emoji="${Emoji[$((RANDOM % ${#Emoji[@]}))]}"
 
         if git status --porcelain | grep .; then
           commit_body=""
@@ -209,9 +212,9 @@ jobs:
 
           git add .
           if [ -n "$commit_body" ]; then
-            git commit -m "$random_emoji $commit_msg" -m "$(printf '%b' "$commit_body")"
+            git commit -m "$commit_msg" -m "$(printf '%b' "$commit_body")"
           else
-            git commit -m "$random_emoji $commit_msg"
+            git commit -m "$commit_msg"
           fi
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
           echo "✅ 提交完成: $commit_msg"

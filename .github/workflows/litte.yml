@@ -52,11 +52,12 @@ jobs:
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
 
-    - name: Generate commit messages by package version/upstream
+    - name: 🧠 Generate commit messages by package version/upstream
       env:
         GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
+        echo "🧪 Start generating package commit messages"
         : > /tmp/commit_messages.txt
         : > /tmp/commit_messages_version.txt
         : > /tmp/commit_links.txt
@@ -162,7 +163,7 @@ jobs:
               done
         fi
 
-    - name: Upload
+    - name: 🚀 Upload
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
@@ -209,9 +210,9 @@ jobs:
             git commit -m "$commit_msg"
           fi
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
-          echo "提交完成: $commit_msg"
+          echo "✅ 提交完成: $commit_msg"
         else
-          echo "nothing to commit"
+          echo "ℹ️ nothing to commit"
           exit 0
         fi || exit 0
 

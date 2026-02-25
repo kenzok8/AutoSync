@@ -146,8 +146,20 @@ jobs:
             continue
           fi
 
-          # 仅做版本号更新提交，版本未变化时不纳入提交列表
-          continue
+          # 无版本号或版本未变时，尝试使用上游提交标题
+          upstream_subject=""
+          if [ -n "$new_src_ver" ] && [ "$new_src_ver" != "$old_src_ver" ]; then
+            upstream_subject=$(fetch_upstream_subject "$repo" "$new_src_ver")
+          fi
+          [ -z "$upstream_subject" ] && upstream_subject=$(fetch_upstream_subject "$repo" "$new_src_ver")
+
+          if [ -n "$upstream_subject" ]; then
+            echo "$(random_emoji) $pkg: $upstream_subject" >> /tmp/commit_messages.txt
+          else
+            echo "$(random_emoji) $pkg: sync upstream" >> /tmp/commit_messages.txt
+          fi
+          append_last_commit_link "$pkg" "$repo" "$new_src_ver"
+          echo "$pkg" >> /tmp/updated_packages.txt
         done
 
         sort -u /tmp/updated_packages.txt -o /tmp/updated_packages.txt

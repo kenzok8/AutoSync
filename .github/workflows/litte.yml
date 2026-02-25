@@ -55,6 +55,7 @@ jobs:
     - name: 🧠 Generate commit messages by package version/upstream
       env:
         GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        INPUT_PACKAGES: ${{ github.event.inputs.packages }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
         echo "🧪 Start generating package commit messages"
@@ -62,6 +63,23 @@ jobs:
         : > /tmp/commit_messages_version.txt
         : > /tmp/commit_links.txt
         : > /tmp/updated_packages.txt
+        : > /tmp/target_packages.txt
+
+        if [ -n "${INPUT_PACKAGES}" ] && [ "${INPUT_PACKAGES}" != "false" ]; then
+          for p in ${INPUT_PACKAGES}; do
+            [ -n "$p" ] && echo "$p" >> /tmp/target_packages.txt
+          done
+          sort -u /tmp/target_packages.txt -o /tmp/target_packages.txt
+          echo "🎯 Test mode packages: $(tr '\n' ' ' < /tmp/target_packages.txt)"
+        fi
+
+        in_target_list() {
+          local pkg="$1"
+          if [ ! -s /tmp/target_packages.txt ]; then
+            return 0
+          fi
+          grep -Fxq "$pkg" /tmp/target_packages.txt
+        }
 
         get_make_var() {
           local file="$1"
@@ -122,6 +140,7 @@ jobs:
         for makefile in $changed_makefiles; do
           [ -f "$makefile" ] || continue
           pkg=$(basename "$(dirname "$makefile")")
+          in_target_list "$pkg" || continue
 
           new_ver=$(get_make_var "$makefile" "PKG_VERSION")
           [ -z "$new_ver" ] && new_ver=$(get_make_var "$makefile" "LUCI_VERSION")

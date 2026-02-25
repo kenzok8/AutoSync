@@ -61,6 +61,7 @@ jobs:
         : > /tmp/commit_messages.txt
         : > /tmp/commit_messages_version.txt
         : > /tmp/commit_links.txt
+        : > /tmp/updated_packages.txt
 
         get_make_var() {
           local file="$1"
@@ -141,33 +142,15 @@ jobs:
             echo "$msg" >> /tmp/commit_messages.txt
             echo "$msg" >> /tmp/commit_messages_version.txt
             append_last_commit_link "$pkg" "$repo" "$new_src_ver"
+            echo "$pkg" >> /tmp/updated_packages.txt
             continue
           fi
 
-          # 无版本号或版本未变时，尝试使用上游提交标题
-          upstream_subject=""
-          if [ -n "$new_src_ver" ] && [ "$new_src_ver" != "$old_src_ver" ]; then
-            upstream_subject=$(fetch_upstream_subject "$repo" "$new_src_ver")
-          fi
-          [ -z "$upstream_subject" ] && upstream_subject=$(fetch_upstream_subject "$repo" "$new_src_ver")
-
-          if [ -n "$upstream_subject" ]; then
-            echo "$(random_emoji) $pkg: $upstream_subject" >> /tmp/commit_messages.txt
-          else
-            echo "$(random_emoji) $pkg: sync upstream" >> /tmp/commit_messages.txt
-          fi
-          append_last_commit_link "$pkg" "$repo" "$new_src_ver"
+          # 仅做版本号更新提交，版本未变化时不纳入提交列表
+          continue
         done
 
-        # 如果没有 Makefile 变化但仓库有变更，按目录兜底生成
-        if [ ! -s /tmp/commit_messages.txt ] && git diff --name-only HEAD -- . ':(exclude).github/**' | grep . >/dev/null 2>&1; then
-          git diff --name-only HEAD -- . ':(exclude).github/**' \
-            | awk -F/ 'NF>1{print $1}' \
-            | sort -u \
-            | while read -r pkg; do
-                [ -n "$pkg" ] && [ "$pkg" != "commit" ] && echo "$(random_emoji) $pkg: sync upstream" >> /tmp/commit_messages.txt
-              done
-        fi
+        sort -u /tmp/updated_packages.txt -o /tmp/updated_packages.txt
 
     - name: 🚀 Upload
       env:
@@ -179,7 +162,12 @@ jobs:
           Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
           committed_any=0
 
-          changed_pkgs=$(git diff --name-only HEAD -- . ':(exclude).github/**' | awk -F/ 'NF>1{print $1}' | sort -u)
+          if [ ! -s /tmp/updated_packages.txt ]; then
+            echo "ℹ️ no package-level Makefile updates detected"
+            exit 0
+          fi
+
+          changed_pkgs=$(cat /tmp/updated_packages.txt)
 
           for pkg in $changed_pkgs; do
             [ -n "$pkg" ] || continue
@@ -216,15 +204,6 @@ jobs:
             committed_any=1
             echo "✅ 提交完成: $commit_msg"
           done
-
-          git add .
-          if ! git diff --cached --quiet; then
-            random_emoji="${Emoji[$((RANDOM % ${#Emoji[@]}))]}"
-            fallback_msg="$random_emoji sync: misc package updates"
-            git commit -m "$fallback_msg"
-            committed_any=1
-            echo "✅ 提交完成: $fallback_msg"
-          fi
 
           if [ "$committed_any" -eq 1 ]; then
             git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master

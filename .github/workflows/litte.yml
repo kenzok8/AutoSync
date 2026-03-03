@@ -44,130 +44,43 @@ jobs:
         chmod +x .github/diy/${{matrix.target}}.sh
         git clone -b master https://github.com/kenzok8/litte.git ${{matrix.target}}
         cd ${{matrix.target}}
-        git rm -r --cache * >/dev/null 2>&1 &
-        rm -rf `find ./* -maxdepth 0 -type d` >/dev/null 2>&1
+        find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
 
         $GITHUB_WORKSPACE/.github/diy/litte.sh
         bash /$GITHUB_WORKSPACE/.github/diy/convert_translation.sh
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
 
-    - name: 🧠 Generate commit messages by package version/upstream
-      env:
-        GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+    - name: Detect version-changed packages
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
-        echo "🧪 Start generating package commit messages"
-        : > /tmp/commit_messages.txt
-        : > /tmp/commit_messages_version.txt
-        : > /tmp/commit_links.txt
+        : > /tmp/version_changed_packages.txt
+        : > /tmp/package_version_map.txt
 
-        get_make_var() {
+        get_ver() {
           local file="$1"
-          local var="$2"
-          awk -v v="$var" '
-            $0 ~ "^" v "[[:space:]]*:=" || $0 ~ "^" v "[[:space:]]*=" {
-              sub("^[^=]*=", "", $0)
-              gsub(/^[[:space:]]+|[[:space:]]+$/, "", $0)
-              print $0
-              exit
-            }
-          ' "$file"
+          awk '/^PKG_VERSION[[:space:]]*:=|^PKG_VERSION[[:space:]]*=|^LUCI_VERSION[[:space:]]*:=|^LUCI_VERSION[[:space:]]*=/{sub("^[^=]*=","",$0);gsub(/^[[:space:]]+|[[:space:]]+$/,"",$0);print;exit}' "$file"
         }
 
-        github_repo_from_url() {
-          local url="$1"
-          echo "$url" | sed -nE 's#.*github.com[:/]+([^/]+/[^/.]+)(\.git)?.*#\1#p' | head -1
-        }
-
-        fetch_upstream_subject() {
-          local repo="$1"
-          local sha="$2"
-          local msg=""
-
-          if [ -n "$repo" ] && [ -n "$sha" ] && [ ${#sha} -ge 7 ]; then
-            msg=$(gh api "repos/${repo}/commits/${sha}" --jq '.commit.message // empty' 2>/dev/null || true)
-          fi
-          if [ -z "$msg" ] && [ -n "$repo" ]; then
-            msg=$(gh api "repos/${repo}/commits?per_page=1" --jq '.[0].commit.message // empty' 2>/dev/null || true)
-          fi
-
-          case "$msg" in
-            ""|null|"{"*|"["*|*"API rate limit exceeded"*|*"Bad credentials"*)
-              msg=""
-              ;;
-          esac
-
-          echo "$msg" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//'
-        }
-
-        append_last_commit_link() {
-          local pkg="$1"
-          local repo="$2"
-          local sha="$3"
-          if [ -n "$pkg" ] && [ -n "$repo" ] && [ -n "$sha" ] && [ ${#sha} -ge 7 ]; then
-            echo "$pkg|https://github.com/${repo}/commit/${sha}" >> /tmp/commit_links.txt
-          fi
-        }
-
-        random_emoji() {
-          local Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
-          echo "${Emoji[$((RANDOM % ${#Emoji[@]}))]}"
-        }
-
-        # 仅分析发生变化的 Makefile 对应包
-        changed_makefiles=$(git diff --name-only HEAD -- . ':(exclude).github/**' | grep -E '^[^/]+/Makefile$' || true)
+        changed_makefiles=$(git status --porcelain | sed -E 's/^.. //' | sed -E 's#^[^ ]+ -> ##' | grep -E '^[^/]+/Makefile$' || true)
 
         for makefile in $changed_makefiles; do
           [ -f "$makefile" ] || continue
           pkg=$(basename "$(dirname "$makefile")")
-
-          new_ver=$(get_make_var "$makefile" "PKG_VERSION")
-          [ -z "$new_ver" ] && new_ver=$(get_make_var "$makefile" "LUCI_VERSION")
-          new_src_ver=$(get_make_var "$makefile" "PKG_SOURCE_VERSION")
-          new_src_url=$(get_make_var "$makefile" "PKG_SOURCE_URL")
-          repo=$(github_repo_from_url "$new_src_url")
+          new_ver=$(get_ver "$makefile")
 
           old_ver=""
-          old_src_ver=""
           if git cat-file -e "HEAD:${makefile}" 2>/dev/null; then
-            old_content=$(git show "HEAD:${makefile}")
-            old_ver=$(printf '%s\n' "$old_content" | awk '/^PKG_VERSION[[:space:]]*:=|^PKG_VERSION[[:space:]]*=|^LUCI_VERSION[[:space:]]*:=|^LUCI_VERSION[[:space:]]*=/{sub("^[^=]*=","",$0);gsub(/^[[:space:]]+|[[:space:]]+$/,"",$0);print;exit}')
-            old_src_ver=$(printf '%s\n' "$old_content" | awk '/^PKG_SOURCE_VERSION[[:space:]]*:=|^PKG_SOURCE_VERSION[[:space:]]*=/{sub("^[^=]*=","",$0);gsub(/^[[:space:]]+|[[:space:]]+$/,"",$0);print;exit}')
+            old_ver=$(git show "HEAD:${makefile}" | awk '/^PKG_VERSION[[:space:]]*:=|^PKG_VERSION[[:space:]]*=|^LUCI_VERSION[[:space:]]*:=|^LUCI_VERSION[[:space:]]*=/{sub("^[^=]*=","",$0);gsub(/^[[:space:]]+|[[:space:]]+$/,"",$0);print;exit}')
           fi
 
-          if [ -n "$new_ver" ] && [ "$new_ver" != "$old_ver" ]; then
-            msg="$(random_emoji) $pkg: update to $new_ver"
-            echo "$msg" >> /tmp/commit_messages.txt
-            echo "$msg" >> /tmp/commit_messages_version.txt
-            append_last_commit_link "$pkg" "$repo" "$new_src_ver"
-            continue
+          if [ "$new_ver" != "$old_ver" ]; then
+            echo "$pkg" >> /tmp/version_changed_packages.txt
+            echo "$pkg|$new_ver" >> /tmp/package_version_map.txt
           fi
-
-          # 无版本号或版本未变时，尝试使用上游提交标题
-          upstream_subject=""
-          if [ -n "$new_src_ver" ] && [ "$new_src_ver" != "$old_src_ver" ]; then
-            upstream_subject=$(fetch_upstream_subject "$repo" "$new_src_ver")
-          fi
-          [ -z "$upstream_subject" ] && upstream_subject=$(fetch_upstream_subject "$repo" "$new_src_ver")
-
-          if [ -n "$upstream_subject" ]; then
-            echo "$(random_emoji) $pkg: $upstream_subject" >> /tmp/commit_messages.txt
-          else
-            echo "$(random_emoji) $pkg: sync upstream" >> /tmp/commit_messages.txt
-          fi
-          append_last_commit_link "$pkg" "$repo" "$new_src_ver"
         done
 
-        # 如果没有 Makefile 变化但仓库有变更，按目录兜底生成
-        if [ ! -s /tmp/commit_messages.txt ] && git diff --name-only HEAD -- . ':(exclude).github/**' | grep . >/dev/null 2>&1; then
-          git diff --name-only HEAD -- . ':(exclude).github/**' \
-            | awk -F/ 'NF>1{print $1}' \
-            | sort -u \
-            | while read -r pkg; do
-                [ -n "$pkg" ] && [ "$pkg" != "commit" ] && echo "$(random_emoji) $pkg: sync upstream" >> /tmp/commit_messages.txt
-              done
-        fi
+        sort -u /tmp/version_changed_packages.txt -o /tmp/version_changed_packages.txt
 
     - name: 🚀 Upload
       env:
@@ -175,67 +88,63 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
 
-        if git status --porcelain | grep .; then
-          Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
-          committed_any=0
+        git reset >/dev/null 2>&1 || true
 
-          changed_pkgs=$(git diff --name-only HEAD -- . ':(exclude).github/**' | awk -F/ 'NF>1{print $1}' | sort -u)
-
-          for pkg in $changed_pkgs; do
-            [ -n "$pkg" ] || continue
-            [ -d "$pkg" ] || continue
-
-            git add "$pkg"
-            if git diff --cached --quiet; then
-              continue
-            fi
-
-            commit_msg=""
-            if [ -s /tmp/commit_messages_version.txt ]; then
-              commit_msg=$(awk -v p="$pkg" '$0 ~ ("^[^[:space:]]+[[:space:]]+" p ": ") {print; exit}' /tmp/commit_messages_version.txt)
-            fi
-            if [ -z "$commit_msg" ] && [ -s /tmp/commit_messages.txt ]; then
-              commit_msg=$(awk -v p="$pkg" '$0 ~ ("^[^[:space:]]+[[:space:]]+" p ": ") {print; exit}' /tmp/commit_messages.txt)
-            fi
-            if [ -z "$commit_msg" ]; then
-              random_emoji="${Emoji[$((RANDOM % ${#Emoji[@]}))]}"
-              commit_msg="$random_emoji $pkg: sync upstream"
-            fi
-
-            url=""
-            if [ -s /tmp/commit_links.txt ]; then
-              url=$(awk -F'|' -v p="$pkg" '$1==p{print $2; exit}' /tmp/commit_links.txt)
-            fi
-
-            if [ -n "$url" ]; then
-              git commit -m "$commit_msg" -m "$(printf '%b' "$pkg:\nlast commit: $url")"
-            else
-              git commit -m "$commit_msg"
-            fi
-
-            committed_any=1
-            echo "✅ 提交完成: $commit_msg"
-          done
-
-          git add .
-          if ! git diff --cached --quiet; then
-            random_emoji="${Emoji[$((RANDOM % ${#Emoji[@]}))]}"
-            fallback_msg="$random_emoji sync: misc package updates"
-            git commit -m "$fallback_msg"
-            committed_any=1
-            echo "✅ 提交完成: $fallback_msg"
-          fi
-
-          if [ "$committed_any" -eq 1 ]; then
-            git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
-          else
-            echo "ℹ️ nothing to commit"
-            exit 0
-          fi
-        else
+        if ! git status --porcelain | grep . >/dev/null; then
           echo "ℹ️ nothing to commit"
           exit 0
-        fi || exit 0
+        fi
+
+        if [ -s /tmp/version_changed_packages.txt ]; then
+          while read -r pkg; do
+            [ -n "$pkg" ] && [ -d "$pkg" ] && git add "$pkg"
+          done < /tmp/version_changed_packages.txt
+        else
+          changed_root_files=$(git status --porcelain | sed -E 's/^.. //' | sed -E 's#^[^ ]+ -> ##' | awk -F/ 'NF==1 {print $0}' || true)
+          for f in $changed_root_files; do
+            [ -n "$f" ] && git add "$f" || true
+          done
+        fi
+
+        if git diff --cached --quiet; then
+          echo "ℹ️ nothing to commit"
+          exit 0
+        fi
+
+        changed_packages=$(git diff --cached --name-only -- . ':(exclude).github/**' | awk -F/ 'NF>1{print $1}' | sort -u)
+        pkg_count=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | wc -l | tr -d ' ')
+
+        get_pkg_version() {
+          local pkg="$1"
+          if [ -s /tmp/package_version_map.txt ]; then
+            awk -F'|' -v p="$pkg" '$1==p{print $2; exit}' /tmp/package_version_map.txt
+            return 0
+          fi
+          echo ""
+        }
+
+        if [ "$pkg_count" -eq 0 ]; then
+          commit_msg="📦 sync: refresh packages"
+        elif [ "$pkg_count" -eq 1 ]; then
+          pkg=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | head -n1)
+          ver=$(get_pkg_version "$pkg")
+          if [ -n "$ver" ]; then
+            commit_msg="📦 $pkg: update to $ver"
+          else
+            commit_msg="📦 $pkg: update to latest"
+          fi
+        elif [ "$pkg_count" -le 5 ]; then
+          pkg_list=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | paste -sd ',' -)
+          commit_msg="📦 update: $pkg_list"
+        else
+          first_two=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | head -n2 | paste -sd ',' -)
+          more_count=$((pkg_count - 2))
+          commit_msg="📦 update: $first_two and $more_count more"
+        fi
+
+        git commit -m "$commit_msg"
+        git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
+        echo "✅ 提交完成: $commit_msg"
 
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@main

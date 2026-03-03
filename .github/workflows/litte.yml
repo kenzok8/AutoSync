@@ -51,6 +51,37 @@ jobs:
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
 
+    - name: Detect version-changed packages
+      run: |
+        cd $GITHUB_WORKSPACE/${{matrix.target}}
+        : > /tmp/version_changed_packages.txt
+        : > /tmp/package_version_map.txt
+
+        get_ver() {
+          local file="$1"
+          awk '/^PKG_VERSION[[:space:]]*:=|^PKG_VERSION[[:space:]]*=|^LUCI_VERSION[[:space:]]*:=|^LUCI_VERSION[[:space:]]*=/{sub("^[^=]*=","",$0);gsub(/^[[:space:]]+|[[:space:]]+$/,"",$0);print;exit}' "$file"
+        }
+
+        changed_makefiles=$(git status --porcelain | sed -E 's/^.. //' | sed -E 's#^[^ ]+ -> ##' | grep -E '^[^/]+/Makefile$' || true)
+
+        for makefile in $changed_makefiles; do
+          [ -f "$makefile" ] || continue
+          pkg=$(basename "$(dirname "$makefile")")
+          new_ver=$(get_ver "$makefile")
+
+          old_ver=""
+          if git cat-file -e "HEAD:${makefile}" 2>/dev/null; then
+            old_ver=$(git show "HEAD:${makefile}" | awk '/^PKG_VERSION[[:space:]]*:=|^PKG_VERSION[[:space:]]*=|^LUCI_VERSION[[:space:]]*:=|^LUCI_VERSION[[:space:]]*=/{sub("^[^=]*=","",$0);gsub(/^[[:space:]]+|[[:space:]]+$/,"",$0);print;exit}')
+          fi
+
+          if [ "$new_ver" != "$old_ver" ]; then
+            echo "$pkg" >> /tmp/version_changed_packages.txt
+            echo "$pkg|$new_ver" >> /tmp/package_version_map.txt
+          fi
+        done
+
+        sort -u /tmp/version_changed_packages.txt -o /tmp/version_changed_packages.txt
+
     - name: 🚀 Upload
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
@@ -64,14 +95,32 @@ jobs:
           exit 0
         fi
 
-        changed_packages=$(git status --porcelain | sed -E 's/^.. //' | sed -E 's#^[^ ]+ -> ##' | awk -F/ '$1 != ".github" && NF > 1 {print $1}' | sort -u)
+        if [ -s /tmp/version_changed_packages.txt ]; then
+          while read -r pkg; do
+            [ -n "$pkg" ] && [ -d "$pkg" ] && git add "$pkg"
+          done < /tmp/version_changed_packages.txt
+        else
+          changed_root_files=$(git status --porcelain | sed -E 's/^.. //' | sed -E 's#^[^ ]+ -> ##' | awk -F/ 'NF==1 {print $0}' || true)
+          for f in $changed_root_files; do
+            [ -n "$f" ] && git add "$f" || true
+          done
+        fi
+
+        if git diff --cached --quiet; then
+          echo "ℹ️ nothing to commit"
+          exit 0
+        fi
+
+        changed_packages=$(git diff --cached --name-only -- . ':(exclude).github/**' | awk -F/ 'NF>1{print $1}' | sort -u)
         pkg_count=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | wc -l | tr -d ' ')
 
         get_pkg_version() {
           local pkg="$1"
-          local mk="$pkg/Makefile"
-          [ -f "$mk" ] || return 0
-          awk '/^PKG_VERSION[[:space:]]*:=|^PKG_VERSION[[:space:]]*=|^LUCI_VERSION[[:space:]]*:=|^LUCI_VERSION[[:space:]]*=/{sub("^[^=]*=","",$0);gsub(/^[[:space:]]+|[[:space:]]+$/,"",$0);print;exit}' "$mk"
+          if [ -s /tmp/package_version_map.txt ]; then
+            awk -F'|' -v p="$pkg" '$1==p{print $2; exit}' /tmp/package_version_map.txt
+            return 0
+          fi
+          echo ""
         }
 
         if [ "$pkg_count" -eq 0 ]; then
@@ -91,12 +140,6 @@ jobs:
           first_two=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | head -n2 | paste -sd ',' -)
           more_count=$((pkg_count - 2))
           commit_msg="📦 update: $first_two and $more_count more"
-        fi
-
-        git add -A
-        if git diff --cached --quiet; then
-          echo "ℹ️ nothing to commit"
-          exit 0
         fi
 
         git commit -m "$commit_msg"

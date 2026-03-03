@@ -64,7 +64,7 @@ jobs:
           exit 0
         fi
 
-        changed_packages=$(git diff --name-only -- . ':(exclude).github/**' | awk -F/ 'NF>1{print $1}' | sort -u)
+        changed_packages=$(git status --porcelain | sed -E 's/^.. //' | sed -E 's#^[^ ]+ -> ##' | awk -F/ '$1 != ".github" && NF > 1 {print $1}' | sort -u)
         pkg_count=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | wc -l | tr -d ' ')
 
         get_pkg_version() {

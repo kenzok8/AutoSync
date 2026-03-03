@@ -14,14 +14,6 @@ on:
         description: 'packages'
         required: false
         default: 'false'
-      simulate_changes:
-        description: 'simulate package version/hash changes for validation'
-        required: false
-        default: 'false'
-      push_ref:
-        description: 'target branch in kenzok8/litte'
-        required: false
-        default: 'master'
 
 jobs:
   job_litte:
@@ -59,17 +51,6 @@ jobs:
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
 
-        if [ "${{ github.event.inputs.simulate_changes }}" = "true" ]; then
-          echo "🔬 simulate package version/hash changes"
-          for pkg in adguardhome ddns-go brook; do
-            mk="$pkg/Makefile"
-            [ -f "$mk" ] || continue
-            sed -i -E 's/^(PKG_VERSION[[:space:]]*:?=).*/\1 99.99.99/' "$mk" || true
-            sed -i -E 's/^(PKG_MIRROR_HASH[[:space:]]*:?=).*/\1 1111111111111111111111111111111111111111111111111111111111111111/' "$mk" || true
-            sed -i -E 's/^(PKG_HASH[[:space:]]*:?=).*/\1 1111111111111111111111111111111111111111111111111111111111111111/' "$mk" || true
-          done
-        fi
-
     - name: Detect version-changed packages
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
@@ -104,7 +85,6 @@ jobs:
     - name: 🚀 Upload
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        PUSH_REF: ${{ github.event.inputs.push_ref }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
 
@@ -163,8 +143,7 @@ jobs:
         fi
 
         git commit -m "$commit_msg"
-        target_ref="${PUSH_REF:-master}"
-        git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" "HEAD:${target_ref}"
+        git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
         echo "✅ 提交完成: $commit_msg"
 
     - name: Delete workflow runs

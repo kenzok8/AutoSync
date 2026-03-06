@@ -171,7 +171,7 @@ jobs:
         fi
 
         if [ "$committed_any" = "true" ]; then
-          git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/openwrt-packages.git" HEAD:master
+          git push --force --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/openwrt-packages.git" HEAD:master
           echo "✅ Push 完成"
         else
           echo "ℹ️ nothing to push"

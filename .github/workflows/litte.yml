@@ -44,7 +44,8 @@ jobs:
         chmod +x .github/diy/${{matrix.target}}.sh
         git clone -b master https://github.com/kenzok8/litte.git ${{matrix.target}}
         cd ${{matrix.target}}
-        find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+        # 保留 .git 和 .github，只删除包目录
+        find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.github' -exec rm -rf {} +
 
         $GITHUB_WORKSPACE/.github/diy/litte.sh
         bash /$GITHUB_WORKSPACE/.github/diy/convert_translation.sh
@@ -57,14 +58,13 @@ jobs:
         : > /tmp/version_changed_packages.txt
         : > /tmp/package_version_map.txt
 
-        # 从 Makefile 文件中提取版本号（支持 PKG_VERSION / LUCI_VERSION，支持 := 和 =）
         get_ver() {
           awk '/^(PKG_VERSION|LUCI_VERSION)[[:space:]]*:?=/{
             sub(/^[^=]*=[[:space:]]*/,""); gsub(/[[:space:]]+$/,""); print; exit
           }' "$1"
         }
 
-        # 直接遍历所有 Makefile，不依赖 git status（避免漏掉 untracked 新包）
+        # 直接遍历所有 Makefile，不依赖 git status（新包 untracked 也能捕获）
         for makefile in */Makefile; do
           [ -f "$makefile" ] || continue
           pkg=$(dirname "$makefile")
@@ -85,7 +85,7 @@ jobs:
         done
 
         sort -u /tmp/version_changed_packages.txt -o /tmp/version_changed_packages.txt
-        echo "版本变更包数量: $(wc -l < /tmp/version_changed_packages.txt)"
+        echo "版本变更包: $(wc -l < /tmp/version_changed_packages.txt) 个"
         cat /tmp/package_version_map.txt
 
     - name: 🚀 Upload
@@ -94,7 +94,7 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
 
-        # 全量 add，确保所有变更（新增/修改/删除）都被收录
+        # 全量 add，识别所有变更
         git add -A
 
         if git diff --cached --quiet; then
@@ -102,55 +102,71 @@ jobs:
           exit 0
         fi
 
+        # 获取版本号（从版本变更表）
         get_pkg_version() {
           local pkg="$1"
           [ -s /tmp/package_version_map.txt ] || { echo ""; return; }
           awk -F'|' -v p="$pkg" '$1==p{print $2; exit}' /tmp/package_version_map.txt
         }
 
-        # 从 staged 变更中提取顶层包目录名，排除 .github
-        changed_packages=$(git diff --cached --name-only -- . ':(exclude).github/**' \
+        # 获取上游 commit 信息（从 litte.sh 预先保存的文件）
+        get_upstream_msg() {
+          local pkg="$1"
+          [ -s /tmp/upstream_commit_msgs.txt ] || { echo ""; return; }
+          awk -F'|' -v p="$pkg" '$1==p{
+            # 去掉 "pkgname: " 前缀避免重复
+            sub(/^[^|]*\|/,""); print; exit
+          }' /tmp/upstream_commit_msgs.txt
+        }
+
+        # 获取所有变更的顶层包目录（排除 .github）
+        all_changed=$(git diff --cached --name-only -- . ':(exclude).github/**' \
           | awk -F/ 'NF>1{print $1}' | sort -u)
-        pkg_count=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | wc -l | tr -d ' ')
 
-        if [ "$pkg_count" -eq 0 ]; then
-          commit_msg="📦 sync: refresh packages"
+        # 逐包单独提交
+        git reset HEAD -- . 2>/dev/null || git reset 2>/dev/null || true
+        committed_any=false
 
-        elif [ "$pkg_count" -eq 1 ]; then
-          pkg=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | head -n1)
+        while IFS= read -r pkg; do
+          [ -z "$pkg" ] && continue
+
+          # 暂存该包的所有变更（新增/修改/删除）
+          git add -A -- "$pkg/" 2>/dev/null || true
+
+          git diff --cached --quiet && continue
+
           ver=$(get_pkg_version "$pkg")
           if [ -n "$ver" ]; then
             commit_msg="📦 $pkg: update to $ver"
           else
-            commit_msg="📦 $pkg: sync upstream"
+            upstream_msg=$(get_upstream_msg "$pkg")
+            # 去掉上游信息中可能的 "pkgname: " 重复前缀
+            upstream_msg=$(echo "$upstream_msg" | sed "s/^${pkg}[[:space:]]*:[[:space:]]*//" | sed 's/^[[:space:]]*//')
+            if [ -n "$upstream_msg" ]; then
+              commit_msg="📦 $pkg: $upstream_msg"
+            else
+              commit_msg="📦 $pkg: sync upstream"
+            fi
           fi
 
-        elif [ "$pkg_count" -le 5 ]; then
-          # 2-5 个包：列出每个包及其版本号（有版本则附带，无则省略）
-          pkg_ver_list=""
-          while IFS= read -r pkg; do
-            [ -z "$pkg" ] && continue
-            ver=$(get_pkg_version "$pkg")
-            if [ -n "$ver" ]; then
-              pkg_ver_list="${pkg_ver_list}${pkg}(${ver}), "
-            else
-              pkg_ver_list="${pkg_ver_list}${pkg}, "
-            fi
-          done <<< "$changed_packages"
-          # 去掉末尾 ", "
-          pkg_ver_list="${pkg_ver_list%, }"
-          commit_msg="📦 update: $pkg_ver_list"
+          git commit -m "$commit_msg"
+          echo "✅ $commit_msg"
+          committed_any=true
+        done <<< "$all_changed"
 
-        else
-          # 超过 5 个包：只列前 2 个 + 数量
-          first_two=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | head -n2 | paste -sd ',' -)
-          more_count=$((pkg_count - 2))
-          commit_msg="📦 update: $first_two and $more_count more"
+        # 处理剩余变更（根目录文件等）
+        git add -A
+        if ! git diff --cached --quiet; then
+          git commit -m "📦 sync: refresh packages"
+          committed_any=true
         fi
 
-        git commit -m "$commit_msg"
-        git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
-        echo "✅ 提交完成: $commit_msg"
+        if [ "$committed_any" = "true" ]; then
+          git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
+          echo "✅ Push 完成"
+        else
+          echo "ℹ️ nothing to commit"
+        fi
 
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@main

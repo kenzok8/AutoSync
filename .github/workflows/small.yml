@@ -95,6 +95,8 @@ jobs:
         cd $GITHUB_WORKSPACE/${{matrix.target}}
 
         git add -A
+        # 不修改 README.md，始终还原为 HEAD 版本
+        git checkout HEAD -- README.md 2>/dev/null || true
 
         if git diff --cached --quiet; then
           echo "ℹ️ nothing to commit"

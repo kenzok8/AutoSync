@@ -57,21 +57,25 @@ jobs:
         : > /tmp/version_changed_packages.txt
         : > /tmp/package_version_map.txt
 
+        # 从 Makefile 文件中提取版本号（支持 PKG_VERSION / LUCI_VERSION，支持 := 和 =）
         get_ver() {
-          local file="$1"
-          awk '/^PKG_VERSION[[:space:]]*:=|^PKG_VERSION[[:space:]]*=|^LUCI_VERSION[[:space:]]*:=|^LUCI_VERSION[[:space:]]*=/{sub("^[^=]*=","",$0);gsub(/^[[:space:]]+|[[:space:]]+$/,"",$0);print;exit}' "$file"
+          awk '/^(PKG_VERSION|LUCI_VERSION)[[:space:]]*:?=/{
+            sub(/^[^=]*=[[:space:]]*/,""); gsub(/[[:space:]]+$/,""); print; exit
+          }' "$1"
         }
 
-        changed_makefiles=$(git status --porcelain | sed -E 's/^.. //' | sed -E 's#^[^ ]+ -> ##' | grep -E '^[^/]+/Makefile$' || true)
-
-        for makefile in $changed_makefiles; do
+        # 直接遍历所有 Makefile，不依赖 git status（避免漏掉 untracked 新包）
+        for makefile in */Makefile; do
           [ -f "$makefile" ] || continue
-          pkg=$(basename "$(dirname "$makefile")")
+          pkg=$(dirname "$makefile")
           new_ver=$(get_ver "$makefile")
+          [ -z "$new_ver" ] && continue
 
           old_ver=""
           if git cat-file -e "HEAD:${makefile}" 2>/dev/null; then
-            old_ver=$(git show "HEAD:${makefile}" | awk '/^PKG_VERSION[[:space:]]*:=|^PKG_VERSION[[:space:]]*=|^LUCI_VERSION[[:space:]]*:=|^LUCI_VERSION[[:space:]]*=/{sub("^[^=]*=","",$0);gsub(/^[[:space:]]+|[[:space:]]+$/,"",$0);print;exit}')
+            old_ver=$(git show "HEAD:${makefile}" | awk '/^(PKG_VERSION|LUCI_VERSION)[[:space:]]*:?=/{
+              sub(/^[^=]*=[[:space:]]*/,""); gsub(/[[:space:]]+$/,""); print; exit
+            }')
           fi
 
           if [ "$new_ver" != "$old_ver" ]; then
@@ -81,6 +85,8 @@ jobs:
         done
 
         sort -u /tmp/version_changed_packages.txt -o /tmp/version_changed_packages.txt
+        echo "版本变更包数量: $(wc -l < /tmp/version_changed_packages.txt)"
+        cat /tmp/package_version_map.txt
 
     - name: 🚀 Upload
       env:
@@ -88,55 +94,55 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
 
-        git reset >/dev/null 2>&1 || true
-
-        if ! git status --porcelain | grep . >/dev/null; then
-          echo "ℹ️ nothing to commit"
-          exit 0
-        fi
-
-        if [ -s /tmp/version_changed_packages.txt ]; then
-          while read -r pkg; do
-            [ -n "$pkg" ] && [ -d "$pkg" ] && git add "$pkg"
-          done < /tmp/version_changed_packages.txt
-        else
-          changed_root_files=$(git status --porcelain | sed -E 's/^.. //' | sed -E 's#^[^ ]+ -> ##' | awk -F/ 'NF==1 {print $0}' || true)
-          for f in $changed_root_files; do
-            [ -n "$f" ] && git add "$f" || true
-          done
-        fi
+        # 全量 add，确保所有变更（新增/修改/删除）都被收录
+        git add -A
 
         if git diff --cached --quiet; then
           echo "ℹ️ nothing to commit"
           exit 0
         fi
 
-        changed_packages=$(git diff --cached --name-only -- . ':(exclude).github/**' | awk -F/ 'NF>1{print $1}' | sort -u)
-        pkg_count=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | wc -l | tr -d ' ')
-
         get_pkg_version() {
           local pkg="$1"
-          if [ -s /tmp/package_version_map.txt ]; then
-            awk -F'|' -v p="$pkg" '$1==p{print $2; exit}' /tmp/package_version_map.txt
-            return 0
-          fi
-          echo ""
+          [ -s /tmp/package_version_map.txt ] || { echo ""; return; }
+          awk -F'|' -v p="$pkg" '$1==p{print $2; exit}' /tmp/package_version_map.txt
         }
+
+        # 从 staged 变更中提取顶层包目录名，排除 .github
+        changed_packages=$(git diff --cached --name-only -- . ':(exclude).github/**' \
+          | awk -F/ 'NF>1{print $1}' | sort -u)
+        pkg_count=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | wc -l | tr -d ' ')
 
         if [ "$pkg_count" -eq 0 ]; then
           commit_msg="📦 sync: refresh packages"
+
         elif [ "$pkg_count" -eq 1 ]; then
           pkg=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | head -n1)
           ver=$(get_pkg_version "$pkg")
           if [ -n "$ver" ]; then
             commit_msg="📦 $pkg: update to $ver"
           else
-            commit_msg="📦 $pkg: update to latest"
+            commit_msg="📦 $pkg: sync upstream"
           fi
+
         elif [ "$pkg_count" -le 5 ]; then
-          pkg_list=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | paste -sd ',' -)
-          commit_msg="📦 update: $pkg_list"
+          # 2-5 个包：列出每个包及其版本号（有版本则附带，无则省略）
+          pkg_ver_list=""
+          while IFS= read -r pkg; do
+            [ -z "$pkg" ] && continue
+            ver=$(get_pkg_version "$pkg")
+            if [ -n "$ver" ]; then
+              pkg_ver_list="${pkg_ver_list}${pkg}(${ver}), "
+            else
+              pkg_ver_list="${pkg_ver_list}${pkg}, "
+            fi
+          done <<< "$changed_packages"
+          # 去掉末尾 ", "
+          pkg_ver_list="${pkg_ver_list%, }"
+          commit_msg="📦 update: $pkg_ver_list"
+
         else
+          # 超过 5 个包：只列前 2 个 + 数量
           first_two=$(printf '%s\n' "$changed_packages" | sed '/^$/d' | head -n2 | paste -sd ',' -)
           more_count=$((pkg_count - 2))
           commit_msg="📦 update: $first_two and $more_count more"

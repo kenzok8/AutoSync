@@ -7,13 +7,11 @@ extract_version() {
     local pkg_name="$3"
     
     if [ -d "$local_dir" ]; then
-        # 尝试从 git 获取最新 tag
         cd "$local_dir"
         if git rev-parse --git-dir > /dev/null 2>&1; then
             latest_tag=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//')
             if [ -n "$latest_tag" ]; then
                 echo "提取到 $pkg_name 版本: $latest_tag"
-                # 更新 Makefile 中的版本信息
                 if [ -f "Makefile" ]; then
                     sed -i "s/PKG_VERSION:=.*/PKG_VERSION:=$latest_tag/" Makefile 2>/dev/null || true
                 fi
@@ -96,7 +94,18 @@ git clone --depth 1 https://github.com/AngelaCooljx/luci-theme-material3
 git clone --depth 1 https://github.com/sbwml/luci-app-openlist2 oplist && mvdir oplist
 git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-argon-config,luci-app-dae,luci-app-daed,luci-app-diskman,luci-app-filebrowser-go,luci-app-filebrowser,luci-app-gost,luci-app-microsocks,luci-app-openlist,luci-app-qbittorrent,luci-app-snmpd,luci-app-smartdns,luci-app-transmission,luci-app-v2raya,luci-app-watchcat,luci-app-eoip，luci-app-smartdns} ./ ; rm -rf luci
 
-echo "完成包克隆和版本提取"
+echo "完成包克隆"
+
+# ── 提前保存各包的上游最新 commit 信息（在删除 .git 之前）──
+echo "保存上游 commit 信息..."
+: > /tmp/upstream_commit_msgs.txt
+for dir in */; do
+    pkg="${dir%/}"
+    [ -d "$pkg/.git" ] || continue
+    msg=$(git -C "$pkg" log -1 --pretty=format:'%s' 2>/dev/null)
+    [ -n "$msg" ] && printf '%s|%s\n' "$pkg" "$msg" >> /tmp/upstream_commit_msgs.txt
+done
+echo "已保存 $(wc -l < /tmp/upstream_commit_msgs.txt) 个包的 commit 信息"
 
 # 原有的 sed 处理逻辑
 sed -i \

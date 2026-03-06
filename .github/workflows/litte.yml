@@ -44,7 +44,7 @@ jobs:
         chmod +x .github/diy/${{matrix.target}}.sh
         git clone -b master https://github.com/kenzok8/litte.git ${{matrix.target}}
         cd ${{matrix.target}}
-        # 保留 .git 和 .github，只删除包目录
+        # 保留 .git 和 .github，只清除包目录
         find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.github' -exec rm -rf {} +
 
         $GITHUB_WORKSPACE/.github/diy/litte.sh
@@ -64,7 +64,7 @@ jobs:
           }' "$1"
         }
 
-        # 直接遍历所有 Makefile，不依赖 git status（新包 untracked 也能捕获）
+        # 遍历所有 Makefile（新包 untracked 也能捕获）
         for makefile in */Makefile; do
           [ -f "$makefile" ] || continue
           pkg=$(dirname "$makefile")
@@ -94,7 +94,6 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
 
-        # 全量 add，识别所有变更
         git add -A
 
         if git diff --cached --quiet; then
@@ -102,24 +101,37 @@ jobs:
           exit 0
         fi
 
-        # 获取版本号（从版本变更表）
         get_pkg_version() {
-          local pkg="$1"
           [ -s /tmp/package_version_map.txt ] || { echo ""; return; }
-          awk -F'|' -v p="$pkg" '$1==p{print $2; exit}' /tmp/package_version_map.txt
+          awk -F'|' -v p="$1" '$1==p{print $2; exit}' /tmp/package_version_map.txt
         }
 
-        # 获取上游 commit 信息（从 litte.sh 预先保存的文件）
+        # 处理上游 commit 信息：
+        # - 保留 emoji（用户希望保留）
+        # - 去掉 "pkgname: " 开头的重复包名前缀
+        # - 过滤 Merge PR / dependabot / Signed-off 等杂乱信息 → 返回空（→ sync upstream）
+        # - 截断超长消息（>72字符）
         get_upstream_msg() {
           local pkg="$1"
           [ -s /tmp/upstream_commit_msgs.txt ] || { echo ""; return; }
-          awk -F'|' -v p="$pkg" '$1==p{
-            # 去掉 "pkgname: " 前缀避免重复
-            sub(/^[^|]*\|/,""); print; exit
-          }' /tmp/upstream_commit_msgs.txt
+          local raw
+          raw=$(awk -F'|' -v p="$pkg" '$1==p{sub(/^[^|]*\|/,""); print; exit}' /tmp/upstream_commit_msgs.txt)
+          [ -z "$raw" ] && { echo ""; return; }
+
+          # 过滤杂乱信息 → 降级为 sync upstream
+          echo "$raw" | grep -qiE '^(Merge (pull request|branch)|Bump |bump actions|Signed-off-by:|chore: (bump|format)|Release v?[0-9]|dependabot)' \
+            && { echo ""; return; }
+
+          # 去掉 "pkgname: " 重复前缀（保留 emoji）
+          local msg
+          msg=$(echo "$raw" | sed "s/^${pkg}[[:space:]]*:[[:space:]]*//" | sed 's/^[[:space:]]*//')
+
+          # 截断超长消息
+          [ ${#msg} -gt 72 ] && msg="${msg:0:69}..."
+
+          echo "$msg"
         }
 
-        # 获取所有变更的顶层包目录（排除 .github）
         all_changed=$(git diff --cached --name-only -- . ':(exclude).github/**' \
           | awk -F/ 'NF>1{print $1}' | sort -u)
 
@@ -130,9 +142,7 @@ jobs:
         while IFS= read -r pkg; do
           [ -z "$pkg" ] && continue
 
-          # 暂存该包的所有变更（新增/修改/删除）
           git add -A -- "$pkg/" 2>/dev/null || true
-
           git diff --cached --quiet && continue
 
           ver=$(get_pkg_version "$pkg")
@@ -140,8 +150,6 @@ jobs:
             commit_msg="📦 $pkg: update to $ver"
           else
             upstream_msg=$(get_upstream_msg "$pkg")
-            # 去掉上游信息中可能的 "pkgname: " 重复前缀
-            upstream_msg=$(echo "$upstream_msg" | sed "s/^${pkg}[[:space:]]*:[[:space:]]*//" | sed 's/^[[:space:]]*//')
             if [ -n "$upstream_msg" ]; then
               commit_msg="📦 $pkg: $upstream_msg"
             else
@@ -165,7 +173,7 @@ jobs:
           git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
           echo "✅ Push 完成"
         else
-          echo "ℹ️ nothing to commit"
+          echo "ℹ️ nothing to push"
         fi
 
     - name: Delete workflow runs

@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/small.yml'
-      - 'small.sh'
+      - 'commit/**'
   schedule:
     - cron: 0 */4 * * *
   repository_dispatch:
@@ -34,8 +34,8 @@ jobs:
 
     - name: Initialization environment
       run: |
-        git config --global user.email "kenzok8@users.noreply.github.com"
-        git config --global user.name "actions-user"
+        git config --global user.email "actions@github.com"
+        git config --global user.name "action"
         sudo timedatectl set-timezone "Asia/Shanghai"
 
     - name: Clone packages
@@ -44,175 +44,132 @@ jobs:
         chmod +x .github/diy/small.sh
         git clone -b master https://github.com/kenzok8/small.git ${{matrix.target}}
         cd ${{matrix.target}}
-        git rm -r --cache * >/dev/null 2>&1 &
-        rm -rf `find ./* -maxdepth 0 -type d` >/dev/null 2>&1
+        # 保留 .git 和 .github，只清除包目录
+        find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.github' -exec rm -rf {} +
+
         $GITHUB_WORKSPACE/.github/diy/small.sh
         bash /$GITHUB_WORKSPACE/.github/diy/convert_translation.sh
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
 
-    - name: Generate commit messages by package version/upstream
-      env:
-        GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+    - name: Detect version-changed packages
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
-        : > /tmp/commit_messages.txt
-        : > /tmp/commit_messages_version.txt
-        : > /tmp/commit_links.txt
+        : > /tmp/version_changed_packages.txt
+        : > /tmp/package_version_map.txt
 
-        get_make_var() {
-          local file="$1"
-          local var="$2"
-          awk -v v="$var" '
-            $0 ~ "^" v "[[:space:]]*:=" || $0 ~ "^" v "[[:space:]]*=" {
-              sub("^[^=]*=", "", $0)
-              gsub(/^[[:space:]]+|[[:space:]]+$/, "", $0)
-              print $0
-              exit
-            }
-          ' "$file"
+        get_ver() {
+          awk '/^(PKG_VERSION|LUCI_VERSION)[[:space:]]*:?=/{
+            sub(/^[^=]*=[[:space:]]*/,""); gsub(/[[:space:]]+$/,""); print; exit
+          }' "$1"
         }
 
-        github_repo_from_url() {
-          local url="$1"
-          echo "$url" | sed -nE 's#.*github.com[:/]+([^/]+/[^/.]+)(\.git)?.*#\1#p' | head -1
-        }
-
-        fetch_upstream_subject() {
-          local repo="$1"
-          local sha="$2"
-          local msg=""
-
-          if [ -n "$repo" ] && [ -n "$sha" ] && [ ${#sha} -ge 7 ]; then
-            msg=$(gh api "repos/${repo}/commits/${sha}" --jq '.commit.message // empty' 2>/dev/null || true)
-          fi
-          if [ -z "$msg" ] && [ -n "$repo" ]; then
-            msg=$(gh api "repos/${repo}/commits?per_page=1" --jq '.[0].commit.message // empty' 2>/dev/null || true)
-          fi
-
-          case "$msg" in
-            ""|null|"{"*|"["*|*"API rate limit exceeded"*|*"Bad credentials"*)
-              msg=""
-              ;;
-          esac
-
-          echo "$msg" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//'
-        }
-
-        append_last_commit_link() {
-          local pkg="$1"
-          local repo="$2"
-          local sha="$3"
-          if [ -n "$pkg" ] && [ -n "$repo" ] && [ -n "$sha" ] && [ ${#sha} -ge 7 ]; then
-            echo "$pkg|https://github.com/${repo}/commit/${sha}" >> /tmp/commit_links.txt
-          fi
-        }
-
-        changed_makefiles=$(git diff --name-only HEAD -- . ':(exclude).github/**' | grep -E '^[^/]+/Makefile$' || true)
-
-        for makefile in $changed_makefiles; do
+        # 遍历所有 Makefile（新包 untracked 也能捕获）
+        for makefile in */Makefile; do
           [ -f "$makefile" ] || continue
-          pkg=$(basename "$(dirname "$makefile")")
-
-          new_ver=$(get_make_var "$makefile" "PKG_VERSION")
-          [ -z "$new_ver" ] && new_ver=$(get_make_var "$makefile" "LUCI_VERSION")
-          new_src_ver=$(get_make_var "$makefile" "PKG_SOURCE_VERSION")
-          new_src_url=$(get_make_var "$makefile" "PKG_SOURCE_URL")
-          repo=$(github_repo_from_url "$new_src_url")
+          pkg=$(dirname "$makefile")
+          new_ver=$(get_ver "$makefile")
+          [ -z "$new_ver" ] && continue
 
           old_ver=""
-          old_src_ver=""
           if git cat-file -e "HEAD:${makefile}" 2>/dev/null; then
-            old_content=$(git show "HEAD:${makefile}")
-            old_ver=$(printf '%s\n' "$old_content" | awk '/^PKG_VERSION[[:space:]]*:=|^PKG_VERSION[[:space:]]*=|^LUCI_VERSION[[:space:]]*:=|^LUCI_VERSION[[:space:]]*=/{sub("^[^=]*=","",$0);gsub(/^[[:space:]]+|[[:space:]]+$/,"",$0);print;exit}')
-            old_src_ver=$(printf '%s\n' "$old_content" | awk '/^PKG_SOURCE_VERSION[[:space:]]*:=|^PKG_SOURCE_VERSION[[:space:]]*=/{sub("^[^=]*=","",$0);gsub(/^[[:space:]]+|[[:space:]]+$/,"",$0);print;exit}')
+            old_ver=$(git show "HEAD:${makefile}" | awk '/^(PKG_VERSION|LUCI_VERSION)[[:space:]]*:?=/{
+              sub(/^[^=]*=[[:space:]]*/,""); gsub(/[[:space:]]+$/,""); print; exit
+            }')
           fi
 
-          if [ -n "$new_ver" ] && [ "$new_ver" != "$old_ver" ]; then
-            echo "$pkg: update to $new_ver" >> /tmp/commit_messages.txt
-            echo "$pkg: update to $new_ver" >> /tmp/commit_messages_version.txt
-            append_last_commit_link "$pkg" "$repo" "$new_src_ver"
-            continue
+          if [ "$new_ver" != "$old_ver" ]; then
+            echo "$pkg" >> /tmp/version_changed_packages.txt
+            echo "$pkg|$new_ver" >> /tmp/package_version_map.txt
           fi
-
-          upstream_subject=""
-          if [ -n "$new_src_ver" ] && [ "$new_src_ver" != "$old_src_ver" ]; then
-            upstream_subject=$(fetch_upstream_subject "$repo" "$new_src_ver")
-          fi
-          [ -z "$upstream_subject" ] && upstream_subject=$(fetch_upstream_subject "$repo" "$new_src_ver")
-
-          if [ -n "$upstream_subject" ]; then
-            echo "$pkg: $upstream_subject" >> /tmp/commit_messages.txt
-          else
-            echo "$pkg: sync upstream" >> /tmp/commit_messages.txt
-          fi
-          append_last_commit_link "$pkg" "$repo" "$new_src_ver"
         done
 
-        if [ ! -s /tmp/commit_messages.txt ] && git diff --name-only HEAD -- . ':(exclude).github/**' | grep . >/dev/null 2>&1; then
-          git diff --name-only HEAD -- . ':(exclude).github/**' \
-            | awk -F/ 'NF>1{print $1}' \
-            | sort -u \
-            | while read -r pkg; do
-                [ -n "$pkg" ] && [ "$pkg" != "commit" ] && echo "$pkg: sync upstream" >> /tmp/commit_messages.txt
-              done
-        fi
+        sort -u /tmp/version_changed_packages.txt -o /tmp/version_changed_packages.txt
+        echo "版本变更包: $(wc -l < /tmp/version_changed_packages.txt) 个"
+        cat /tmp/package_version_map.txt
 
-    - name: Upload
+    - name: 🚀 Upload
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         cd $GITHUB_WORKSPACE/${{matrix.target}}
 
-        Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
-        random_emoji="${Emoji[$((RANDOM % ${#Emoji[@]}))]}"
+        git add -A
 
-        if git status --porcelain | grep .; then
-          commit_body=""
-          msg_source="/tmp/commit_messages.txt"
-          if [ -s /tmp/commit_messages_version.txt ]; then
-            msg_source="/tmp/commit_messages_version.txt"
-          fi
-          if [ -s "$msg_source" ]; then
-            count=$(wc -l < "$msg_source")
-            join_with_comma() {
-              awk 'BEGIN{ORS=""} {if (NR>1) printf(", "); printf("%s", $0)} END{print ""}' "$1"
-            }
-            if [ "$count" -eq 1 ]; then
-              commit_msg=$(head -1 "$msg_source")
-            elif [ "$count" -le 3 ]; then
-              commit_msg=$(join_with_comma "$msg_source")
-            else
-              head -3 "$msg_source" > /tmp/commit_messages_top3.txt
-              first3=$(join_with_comma /tmp/commit_messages_top3.txt)
-              commit_msg="$first3 and $((count-3)) more packages"
-            fi
-          else
-            commit_msg="sync: misc package updates"
-          fi
-
-          if [ -s /tmp/commit_links.txt ]; then
-            sort -u /tmp/commit_links.txt > /tmp/commit_links_unique.txt
-            while IFS='|' read -r pkg url; do
-              [ -n "$pkg" ] && [ -n "$url" ] || continue
-              if [ -n "$commit_body" ]; then
-                commit_body="$commit_body\n\n"
-              fi
-              commit_body="$commit_body$pkg:\nlast commit: $url"
-            done < /tmp/commit_links_unique.txt
-          fi
-
-          git add .
-          if [ -n "$commit_body" ]; then
-            git commit -m "$random_emoji $commit_msg" -m "$(printf '%b' "$commit_body")"
-          else
-            git commit -m "$random_emoji $commit_msg"
-          fi
-          git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/small.git" HEAD:master
-        else
-          echo "nothing to commit"
+        if git diff --cached --quiet; then
+          echo "ℹ️ nothing to commit"
           exit 0
-        fi || exit 0
+        fi
+
+        get_pkg_version() {
+          [ -s /tmp/package_version_map.txt ] || { echo ""; return; }
+          awk -F'|' -v p="$1" '$1==p{print $2; exit}' /tmp/package_version_map.txt
+        }
+
+        # 处理上游 commit 信息：过滤杂乱内容，去掉重复包名前缀，截断超长
+        get_upstream_msg() {
+          local pkg="$1"
+          [ -s /tmp/upstream_commit_msgs.txt ] || { echo ""; return; }
+          local raw
+          raw=$(awk -F'|' -v p="$pkg" '$1==p{sub(/^[^|]*\|/,""); print; exit}' /tmp/upstream_commit_msgs.txt)
+          [ -z "$raw" ] && { echo ""; return; }
+
+          # 过滤杂乱信息
+          echo "$raw" | grep -qiE '^(Merge (pull request|branch)|Bump |bump actions|Signed-off-by:|chore: (bump|format)|Release v?[0-9]|dependabot)' \
+            && { echo ""; return; }
+
+          # 去掉 "pkgname: " 重复前缀
+          local msg
+          msg=$(echo "$raw" | sed "s/^${pkg}[[:space:]]*:[[:space:]]*//" | sed 's/^[[:space:]]*//')
+
+          # 截断超长
+          [ ${#msg} -gt 72 ] && msg="${msg:0:69}..."
+          echo "$msg"
+        }
+
+        all_changed=$(git diff --cached --name-only -- . ':(exclude).github/**' \
+          | awk -F/ 'NF>1{print $1}' | sort -u)
+
+        # 逐包单独提交
+        git reset HEAD -- . 2>/dev/null || git reset 2>/dev/null || true
+        committed_any=false
+
+        while IFS= read -r pkg; do
+          [ -z "$pkg" ] && continue
+
+          git add -A -- "$pkg/" 2>/dev/null || true
+          git diff --cached --quiet && continue
+
+          ver=$(get_pkg_version "$pkg")
+          if [ -n "$ver" ]; then
+            commit_msg="📦 $pkg: update to $ver"
+          else
+            upstream_msg=$(get_upstream_msg "$pkg")
+            if [ -n "$upstream_msg" ]; then
+              commit_msg="📦 $pkg: $upstream_msg"
+            else
+              commit_msg="📦 $pkg: sync upstream"
+            fi
+          fi
+
+          git commit -m "$commit_msg"
+          echo "✅ $commit_msg"
+          committed_any=true
+        done <<< "$all_changed"
+
+        # 处理剩余变更（根目录文件等）
+        git add -A
+        if ! git diff --cached --quiet; then
+          git commit -m "📦 sync: refresh packages"
+          committed_any=true
+        fi
+
+        if [ "$committed_any" = "true" ]; then
+          git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/small.git" HEAD:master
+          echo "✅ Push 完成"
+        else
+          echo "ℹ️ nothing to push"
+        fi
 
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@main

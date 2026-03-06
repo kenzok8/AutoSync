@@ -103,6 +103,9 @@ jobs:
           exit 0
         fi
 
+        Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
+        emoji="${Emoji[$((RANDOM % ${#Emoji[@]}))]}"
+
         get_pkg_version() {
           [ -s /tmp/package_version_map.txt ] || { echo ""; return; }
           awk -F'|' -v p="$1" '$1==p{print $2; exit}' /tmp/package_version_map.txt
@@ -144,25 +147,26 @@ jobs:
 
           ver=$(get_pkg_version "$pkg")
           if [ -n "$ver" ]; then
-            commit_msg="📦 $pkg: update to $ver"
+            commit_msg="$pkg: update to $ver"
           else
             upstream_msg=$(get_upstream_msg "$pkg")
             if [ -n "$upstream_msg" ]; then
-              commit_msg="📦 $pkg: $upstream_msg"
+              commit_msg="$pkg: $upstream_msg"
             else
-              commit_msg="📦 $pkg: sync upstream"
+              commit_msg="$pkg: sync upstream"
             fi
           fi
 
-          git commit -m "$commit_msg"
-          echo "✅ $commit_msg"
+          git commit -m "$emoji $commit_msg"
+          echo "✅ $emoji $commit_msg"
           committed_any=true
         done <<< "$all_changed"
 
         # 处理剩余变更（根目录文件等）
         git add -A
+        git checkout HEAD -- README.md 2>/dev/null || true
         if ! git diff --cached --quiet; then
-          git commit -m "📦 sync: refresh packages"
+          git commit -m "$emoji sync: refresh packages"
           committed_any=true
         fi
 

@@ -52,7 +52,7 @@ git clone --depth 1 https://github.com/hubbylei/luci-app-clash
 git clone --depth 1 https://github.com/derisamedia/luci-theme-alpha
 git clone --depth 1 -b v5-lua https://github.com/sbwml/luci-app-mosdns openwrt-mos && mv -n openwrt-mos/luci-app-mosdns ./; rm -rf openwrt-mos
 git clone --depth 1 https://github.com/sbwml/luci-app-mosdns openwrt-mos1 && mv -n openwrt-mos1/mosdns ./; rm -rf openwrt-mos1
-git clone --depth 1 https://github.com/kenzok8/v2dat && mv -n v2dat ./; rm -rf v2dat/.git
+git clone --depth 1 https://github.com/kenzok8/jell jell-v2dat && mv -n jell-v2dat/v2dat ./; rm -rf jell-v2dat
 #git clone --depth 1 https://github.com/sbwml/luci-app-daed daed1 && mv -n daed1/*daed ./; rm -rf daed1
 git clone --depth 1 https://github.com/kenzok8/luci-theme-ifit ifit && mv -n ifit/luci-theme-ifit ./;rm -rf ifit
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argone

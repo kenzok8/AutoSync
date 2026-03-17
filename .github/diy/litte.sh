@@ -77,7 +77,7 @@ git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-a
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/* ./ ; rm -rf wall
 [ -f ucl/Makefile ] && sed -i \
   -e 's/^PKG_SOURCE_URL:=.*/PKG_SOURCE_URL:=https:\/\/codeload.github.com\/kenzok8\/ucl\/tar.gz\/v$(PKG_VERSION)?/' \
-  -e 's/^  URL:=.*/  URL:=https:\/\/github.com\/kenzok8\/ucl/' \
+  -e 's/^[[:space:]]*URL:=.*/  URL:=https:\/\/github.com\/kenzok8\/ucl/' \
   ucl/Makefile
 git clone --depth 1 https://github.com/QiuSimons/luci-app-daed-next daed1 && mvdir daed1
 git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go ddnsgo && mv -n ddnsgo/luci-app-ddns-go ./; rm -rf ddnsgo

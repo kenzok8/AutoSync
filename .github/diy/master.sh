@@ -53,6 +53,7 @@ git clone --depth 1 https://github.com/honwen/luci-app-aliddns
 git clone --depth 1 https://github.com/sbwml/luci-app-openlist2 oplist && mvdir oplist
 #git clone --depth 1 -b lua https://github.com/sbwml/luci-app-alist openwrt-alist1 && mv -n openwrt-alist1/luci-app-alist ./ ; rm -rf openwrt-alist1
 git clone --depth 1 https://github.com/lisaac/luci-app-dockerman dockerman && mv -n dockerman/applications/* ./; rm -rf dockerman
+git clone --depth 1 https://github.com/10000ge10000/luci-app-openclaw
 #git clone --depth 1 https://github.com/vernesong/OpenClash && mv -n OpenClash/luci-app-openclash ./; rm -rf OpenClash
 git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-atmaterial_new litte/luci-theme-tomato ./ ; rm -rf litte
 git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go ddnsgo && mv -n ddnsgo/luci-app-ddns-go ./; rm -rf ddnsgo
@@ -87,6 +88,7 @@ for dir in */; do
 done
 echo "已保存 $(wc -l < /tmp/upstream_commit_msgs.txt) 个包的 commit 信息"
 
+rm -f luci-app-openclaw/CHANGELOG.md luci-app-openclaw/LICENSE luci-app-openclaw/.gitignore luci-app-openclaw/VERSION
 rm -rf ./*/.git ./*/.gitattributes ./*/.svn ./*/.github ./*/.gitignore create_acl_for_luci.err create_acl_for_luci.ok create_acl_for_luci.warn
 rm -rf adguardhome/patches
 exit 0

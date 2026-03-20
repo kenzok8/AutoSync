@@ -28,7 +28,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@main
+      uses: actions/checkout@v6.0.2
       with:
         fetch-depth: 0
 
@@ -178,8 +178,33 @@ jobs:
         fi
 
     - name: Delete workflow runs
-      uses: Mattraks/delete-workflow-runs@main
       continue-on-error: true
-      with:
-        retain_days: 1
-        keep_minimum_runs: 1
+      env:
+        GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        REPO: ${{ github.repository }}
+        WORKFLOW_NAME: ${{ github.workflow }}
+        RETAIN_DAYS: "1"
+        KEEP_MINIMUM_RUNS: "1"
+      run: |
+        set -euo pipefail
+        cutoff=$(date -u -d "${RETAIN_DAYS} days ago" +%s)
+        mapfile -t runs < <(gh run list --repo "$REPO" --workflow "$WORKFLOW_NAME" --limit 200 --json databaseId,createdAt --jq '.[] | [.databaseId, .createdAt] | @tsv')
+        total=${#runs[@]}
+        if [ "$total" -le "$KEEP_MINIMUM_RUNS" ]; then
+          echo "No workflow runs to delete ($total <= $KEEP_MINIMUM_RUNS)"
+          exit 0
+        fi
+        index=0
+        for run in "${runs[@]}"; do
+          index=$((index + 1))
+          if [ "$index" -le "$KEEP_MINIMUM_RUNS" ]; then
+            continue
+          fi
+          run_id=${run%%$'\t'*}
+          created_at=${run#*$'\t'}
+          created_epoch=$(date -u -d "$created_at" +%s)
+          if [ "$created_epoch" -gt "$cutoff" ]; then
+            continue
+          fi
+          gh api --method DELETE "repos/$REPO/actions/runs/$run_id" || true
+        done

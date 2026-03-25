@@ -45,8 +45,8 @@ git clone --depth 1 https://github.com/kiddin9/luci-app-dnsfilter
 git clone --depth 1 https://github.com/yaof2/luci-app-ikoolproxy
 git clone --depth 1 https://github.com/ntlf9t/luci-app-easymesh
 git clone --depth 1 -b openwrt-18.06 https://github.com/tty228/luci-app-wechatpush
-git clone --depth 1 https://github.com/jerrykuku/luci-theme-argon
-git clone --depth 1 https://github.com/sirpdboy/luci-app-advanced
+git clone --depth 1 https://github.com/kenzok78/luci-app-advanced
+git clone --depth 1 https://github.com/kenzok78/luci-theme-argon
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-opentopd
 git clone --depth 1 https://github.com/hubbylei/luci-app-clash
 git clone --depth 1 https://github.com/kenzok78/luci-app-clash
@@ -63,7 +63,8 @@ git clone --depth 1 https://github.com/kenzok78/luci-app-fileassistant
 git_clone https://github.com/kenzok78/luci-design-bundle design-bundle && mv -n design-bundle/*design ./; rm -rf design-bundle
 git clone --depth 1 https://github.com/kenzok78/luci-app-guest-wifi
 #git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
-git clone --depth 1 https://github.com/Huangjoe123/luci-app-eqos
+git clone --depth 1 https://github.com/kenzok78/luci-app-smartdns
+git clone --depth 1 https://github.com/kenzok78/luci-app-eqos
 git clone --depth 1 https://github.com/sirpdboy/luci-app-partexp
 git clone --depth 1 -b master https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic
 git clone --depth 1 https://github.com/kenzok78/luci-app-amlogic amlogic && mv -n amlogic/luci-app-amlogic ./;rm -rf amlogic

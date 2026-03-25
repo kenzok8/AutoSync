@@ -134,6 +134,19 @@ sed -i 's/\(+luci-compat\)/\1 +luci-theme-argon/' luci-app-argon-config/Makefile
 sed -i 's/\(+luci-compat\)/\1 +luci-theme-design/' luci-theme-design-config/Makefile
 sed -i 's/\(+luci-compat\)/\1 +luci-theme-argone/' luci-app-argone-config/Makefile
 
+# Keep only Chinese language files, remove other languages
+for dir in */po; do
+  [ -d "$dir" ] || continue
+  keep="zh_Hans zh_Hant zh-cn zh_CN"
+  for lang in $dir/*/; do
+    [ -d "$lang" ] || continue
+    langname=$(basename "$lang")
+    if ! echo "$keep" | grep -q "$langname"; then
+      rm -rf "$lang"
+    fi
+  done
+done
+
 rm -f luci-app-openclaw/CHANGELOG.md luci-app-openclaw/LICENSE luci-app-openclaw/.gitignore luci-app-openclaw/VERSION
 rm -rf ./*/.git ./*/.gitattributes ./*/.svn ./*/.github ./*/.gitignore create_acl_for_luci.err create_acl_for_luci.ok create_acl_for_luci.warn
 sed -i '/entry({"admin", "nas"}, firstchild(), "NAS", 45).dependent = false/d; s/entry({"admin", "network", "eqos"}, cbi("eqos"), _("EQoS"))/entry({"admin", "network", "eqos"}, cbi("eqos"), _("EQoS"), 121).dependent = true/' luci-app-eqos/luasrc/controller/eqos.lua

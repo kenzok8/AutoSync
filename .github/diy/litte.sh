@@ -49,9 +49,10 @@ git clone --depth 1 https://github.com/jerrykuku/luci-theme-argon
 git clone --depth 1 https://github.com/sirpdboy/luci-app-advanced
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-opentopd
 git clone --depth 1 https://github.com/hubbylei/luci-app-clash
+git clone --depth 1 https://github.com/kenzok78/luci-app-clash
 git clone --depth 1 https://github.com/derisamedia/luci-theme-alpha
-git clone --depth 1 -b v5-lua https://github.com/kenzok8/luci-app-mosdns openwrt-mos && mv -n openwrt-mos/luci-app-mosdns ./; rm -rf openwrt-mos
-git clone --depth 1 -b v5 https://github.com/kenzok8/luci-app-mosdns openwrt-mos1 && mv -n openwrt-mos1/mosdns ./; rm -rf openwrt-mos1
+git clone --depth 1 -b v5-lua https://github.com/kenzok78/luci-app-mosdns openwrt-mos && mv -n openwrt-mos/luci-app-mosdns ./; rm -rf openwrt-mos
+git clone --depth 1 -b v5 https://github.com/kenzok78/luci-app-mosdns openwrt-mos1 && mv -n openwrt-mos1/mosdns ./; rm -rf openwrt-mos1
 #git clone --depth 1 https://github.com/sbwml/luci-app-daed daed1 && mv -n daed1/*daed ./; rm -rf daed1
 git clone --depth 1 https://github.com/kenzok78/luci-theme-infinityfreedom ifit && mv -n ifit/luci-theme-ifit ./;rm -rf ifit
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argone
@@ -65,7 +66,7 @@ git clone --depth 1 https://github.com/kenzok78/luci-app-guest-wifi
 git clone --depth 1 https://github.com/Huangjoe123/luci-app-eqos
 git clone --depth 1 https://github.com/sirpdboy/luci-app-partexp
 git clone --depth 1 -b master https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic
-git clone --depth 1 https://github.com/ophub/luci-app-amlogic amlogic && mv -n amlogic/luci-app-amlogic ./;rm -rf amlogic
+git clone --depth 1 https://github.com/kenzok78/luci-app-amlogic amlogic && mv -n amlogic/luci-app-amlogic ./;rm -rf amlogic
 git clone --depth 1 https://github.com/linkease/istore && mv -n istore/luci/* ./; rm -rf istore
 git clone --depth 1 https://github.com/linkease/nas-packages && mv -n nas-packages/network/services/{ddnsto,quickstart} ./; rm -rf nas-packages
 git clone --depth 1 https://github.com/linkease/nas-packages-luci && mv -n nas-packages-luci/luci/{luci-app-ddnsto,luci-app-istorex,luci-app-quickstart} ./; rm -rf nas-packages-luci

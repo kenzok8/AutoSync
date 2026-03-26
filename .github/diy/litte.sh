@@ -43,36 +43,36 @@ echo "开始克隆包..."
 git clone --depth 1 https://github.com/sirpdboy/luci-app-lucky
 git clone --depth 1 https://github.com/kiddin9/luci-app-dnsfilter
 git clone --depth 1 https://github.com/yaof2/luci-app-ikoolproxy
-git clone --depth 1 https://github.com/ntlf9t/luci-app-easymesh
-git clone --depth 1 -b openwrt-18.06 https://github.com/tty228/luci-app-wechatpush
-git clone --depth 1 https://github.com/kenzok78/luci-app-advanced
-git clone --depth 1 https://github.com/kenzok78/luci-theme-argon
-git clone --depth 1 https://github.com/sirpdboy/luci-theme-opentopd
-git clone --depth 1 https://github.com/hubbylei/luci-app-clash
-git clone --depth 1 https://github.com/kenzok78/luci-app-clash
-git clone --depth 1 https://github.com/derisamedia/luci-theme-alpha
-git clone --depth 1 -b v5-lua https://github.com/kenzok78/luci-app-mosdns openwrt-mos && mv -n openwrt-mos/luci-app-mosdns ./; rm -rf openwrt-mos
-git clone --depth 1 -b v5 https://github.com/kenzok78/luci-app-mosdns openwrt-mos1 && mv -n openwrt-mos1/mosdns ./; rm -rf openwrt-mos1
+#git clone --depth 1 https://github.com/ntlf9t/luci-app-easymesh
+#git clone --depth 1 https://github.com/honwen/luci-app-aliddns
+#git clone --depth 1 https://github.com/hubbylei/luci-app-clash
+#git clone --depth 1 -b v5 https://github.com/kenzok78/luci-app-mosdns openwrt-mos1 && mv -n openwrt-mos1/mosdns ./; rm -rf openwrt-mos1
 #git clone --depth 1 https://github.com/sbwml/luci-app-daed daed1 && mv -n daed1/*daed ./; rm -rf daed1
-git clone --depth 1 https://github.com/kenzok78/luci-theme-infinityfreedom ifit && mv -n ifit/luci-theme-ifit ./;rm -rf ifit
+#git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
+git clone --depth 1 -b openwrt-18.06 https://github.com/tty228/luci-app-wechatpush
+git clone --depth 1 https://github.com/sirpdboy/luci-theme-opentopd
+git clone --depth 1 https://github.com/derisamedia/luci-theme-alpha
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argone
 git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config
 git clone --depth 1 https://github.com/kenzok78/luci-app-adguardhome
-git clone --depth 1 https://github.com/kenzok78/luci-app-fileassistant
-#git clone --depth 1 https://github.com/kenzok78/luci-theme-design
-git_clone https://github.com/kenzok78/luci-design-bundle design-bundle && mv -n design-bundle/*design ./; rm -rf design-bundle
-git clone --depth 1 https://github.com/kenzok78/luci-app-guest-wifi
-#git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
-git clone --depth 1 https://github.com/kenzok78/luci-app-smartdns
+git clone --depth 1 https://github.com/kenzok78/luci-app-advanced
+git clone --depth 1 https://github.com/kenzok78/luci-app-clash
 git clone --depth 1 https://github.com/kenzok78/luci-app-eqos
+git clone --depth 1 https://github.com/kenzok78/luci-app-easymesh
+git clone --depth 1 https://github.com/kenzok78/luci-app-fileassistant
+git clone --depth 1 https://github.com/kenzok78/luci-app-filebrowser
+git clone --depth 1 https://github.com/kenzok78/luci-app-guest-wifi
+git clone --depth 1 https://github.com/kenzok78/luci-app-smartdns
+git clone --depth 1 https://github.com/kenzok78/luci-theme-infinityfreedom ifit && mv -n ifit/luci-theme-ifit ./;rm -rf ifit
+git clone --depth 1 https://github.com/kenzok78/luci-design-bundle design-bundle && mv -n design-bundle/*design ./; rm -rf design-bundle
+git clone --depth 1 https://github.com/kenzok78/luci-app-amlogic amlogic && mv -n amlogic/luci-app-amlogic ./;rm -rf amlogic
+git clone --depth 1 -b v5-lua https://github.com/kenzok78/luci-app-mosdns openwrt-mos && mv -n openwrt-mos/luci-app-mosdns ./; rm -rf openwrt-mos
 git clone --depth 1 https://github.com/sirpdboy/luci-app-partexp
 git clone --depth 1 -b master https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic
-git clone --depth 1 https://github.com/kenzok78/luci-app-amlogic amlogic && mv -n amlogic/luci-app-amlogic ./;rm -rf amlogic
 git clone --depth 1 https://github.com/linkease/istore && mv -n istore/luci/* ./; rm -rf istore
 git clone --depth 1 https://github.com/linkease/nas-packages && mv -n nas-packages/network/services/{ddnsto,quickstart} ./; rm -rf nas-packages
 git clone --depth 1 https://github.com/linkease/nas-packages-luci && mv -n nas-packages-luci/luci/{luci-app-ddnsto,luci-app-istorex,luci-app-quickstart} ./; rm -rf nas-packages-luci
 git clone --depth 1 https://github.com/messense/aliyundrive-webdav aliyundrive && mv -n aliyundrive/openwrt/* ./ ; rm -rf aliyundrive
-git clone --depth 1 https://github.com/honwen/luci-app-aliddns
 git clone --depth 1 -b lua https://github.com/sbwml/luci-app-alist openwrt-alist1 && mv -n openwrt-alist1/luci-app-alist ./ ; rm -rf openwrt-alist1
 git clone --depth 1 https://github.com/lisaac/luci-app-dockerman dockerman && mv -n dockerman/applications/* ./; rm -rf dockerman
 git clone --depth 1 https://github.com/vernesong/OpenClash && mv -n OpenClash/luci-app-openclash ./; rm -rf OpenClash
@@ -88,7 +88,6 @@ git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go ddnsgo && mv -n
 git clone --depth 1 -b main https://github.com/Openwrt-Passwall/openwrt-passwall passwall1 && mv -n passwall1/luci-app-passwall  ./; rm -rf passwall1
 git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall2 passwall2 && mv -n passwall2/luci-app-passwall2 ./;rm -rf passwall2
 git clone --depth 1 https://github.com/fw876/helloworld && mv -n helloworld/{luci-app-ssr-plus,shadow-tls} ./ ; rm -rf helloworld
-git clone --depth 1 https://github.com/kiddin9/kwrt-packages && mv -n kwrt-packages/luci-app-bypass ./ ; rm -rf kwrt-packages
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/net/cdnspeedtest ./ ; rm -rf packages
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/lang/lua-maxminddb ./ ; rm -rf packages
 #git clone --depth 1 -b openwrt-18.06 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-filebrowser} ./ && rm -rf luci
@@ -100,7 +99,8 @@ git clone --depth 1 https://github.com/muink/openwrt-fchomo openwrt-fchomo && mv
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-kucat openwrt-kucat && mv -n openwrt-kucat/luci-theme-kucat ./ ; rm -rf openwrt-kucat
 git clone --depth 1 https://github.com/AngelaCooljx/luci-theme-material3
 git clone --depth 1 https://github.com/sbwml/luci-app-openlist2 oplist && mvdir oplist
-git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-argon-config,luci-app-dae,luci-app-daed,luci-app-diskman,luci-app-filebrowser-go,luci-app-filebrowser,luci-app-gost,luci-app-microsocks,luci-app-openlist,luci-app-qbittorrent,luci-app-snmpd,luci-app-smartdns,luci-app-transmission,luci-app-v2raya,luci-app-watchcat,luci-app-eoip,luci-app-smartdns} ./ ; rm -rf luci
+git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-dae,luci-app-daed,luci-app-diskman,luci-app-filebrowser-go,luci-app-microsocks,luci-app-openlist,luci-app-qbittorrent,luci-app-snmpd,luci-app-transmission,luci-app-v2raya,luci-app-watchcat,luci-app-eoip} ./ ; rm -rf luci
+#git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-argon-config,luci-app-dae,luci-app-daed,luci-app-diskman,luci-app-filebrowser-go,luci-app-filebrowser,luci-app-gost,luci-app-microsocks,luci-app-openlist,luci-app-qbittorrent,luci-app-snmpd,luci-app-smartdns,luci-app-transmission,luci-app-v2raya,luci-app-watchcat,luci-app-eoip,luci-app-smartdns} ./ ; rm -rf luci
 
 # Remove conflicting i18n packages that cause opkg install errors
 rm -rf luci-i18n-* 2>/dev/null || true

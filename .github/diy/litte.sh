@@ -49,10 +49,12 @@ git clone --depth 1 https://github.com/yaof2/luci-app-ikoolproxy
 #git clone --depth 1 -b v5 https://github.com/kenzok78/luci-app-mosdns openwrt-mos1 && mv -n openwrt-mos1/mosdns ./; rm -rf openwrt-mos1
 #git clone --depth 1 https://github.com/sbwml/luci-app-daed daed1 && mv -n daed1/*daed ./; rm -rf daed1
 #git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
-git clone --depth 1 -b openwrt-18.06 https://github.com/tty228/luci-app-wechatpush
+#git clone --depth 1 -b openwrt-18.06 https://github.com/tty228/luci-app-wechatpush
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-opentopd
 git clone --depth 1 https://github.com/derisamedia/luci-theme-alpha
+git clone --depth 1 https://github.com/kenzok78/luci-theme-atmaterial_new
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argone
+git clone --depth 1 https://github.com/kenzok78/luci-theme-tomato
 git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config
 git clone --depth 1 https://github.com/kenzok78/luci-app-adguardhome
 git clone --depth 1 https://github.com/kenzok78/luci-app-advanced
@@ -62,6 +64,7 @@ git clone --depth 1 https://github.com/kenzok78/luci-app-easymesh
 git clone --depth 1 https://github.com/kenzok78/luci-app-fileassistant
 git clone --depth 1 https://github.com/kenzok78/luci-app-filebrowser
 git clone --depth 1 https://github.com/kenzok78/luci-app-guest-wifi
+git clone --depth 1 https://github.com/kenzok78/luci-app-wechatpush
 git clone --depth 1 https://github.com/kenzok78/luci-app-smartdns
 git clone --depth 1 https://github.com/kenzok78/luci-theme-infinityfreedom ifit && mv -n ifit/luci-theme-ifit ./;rm -rf ifit
 git clone --depth 1 https://github.com/kenzok78/luci-design-bundle design-bundle && mv -n design-bundle/*design ./; rm -rf design-bundle
@@ -77,7 +80,7 @@ git clone --depth 1 -b lua https://github.com/sbwml/luci-app-alist openwrt-alist
 git clone --depth 1 https://github.com/lisaac/luci-app-dockerman dockerman && mv -n dockerman/applications/* ./; rm -rf dockerman
 git clone --depth 1 https://github.com/vernesong/OpenClash && mv -n OpenClash/luci-app-openclash ./; rm -rf OpenClash
 git clone --depth 1 https://github.com/10000ge10000/luci-app-openclaw
-git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-atmaterial_new litte/luci-theme-tomato ./ ; rm -rf litte
+#git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-atmaterial_new litte/luci-theme-tomato ./ ; rm -rf litte
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/* ./ ; rm -rf wall
 [ -f ucl/Makefile ] && sed -i \
   -e 's/^PKG_SOURCE_URL:=.*/PKG_SOURCE_URL:=https:\/\/codeload.github.com\/kenzok8\/ucl\/tar.gz\/v$(PKG_VERSION)?/' \

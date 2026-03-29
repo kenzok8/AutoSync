@@ -56,7 +56,7 @@ git clone --depth 1 https://github.com/linkease/nas-packages-luci && mv -n nas-p
 git clone --depth 1 https://github.com/sbwml/luci-app-openlist2 oplist && mvdir oplist
 #git clone --depth 1 -b lua https://github.com/sbwml/luci-app-alist openwrt-alist1 && mv -n openwrt-alist1/luci-app-alist ./ ; rm -rf openwrt-alist1
 git clone --depth 1 https://github.com/lisaac/luci-app-dockerman dockerman && mv -n dockerman/applications/* ./; rm -rf dockerman
-git clone --depth 1 https://github.com/10000ge10000/luci-app-openclaw
+git clone --depth 1 https://github.com/kenzok8/luci-app-openclaw
 git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-atmaterial_new litte/luci-theme-tomato ./ ; rm -rf litte
 git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go ddnsgo && mv -n ddnsgo/luci-app-ddns-go ./; rm -rf ddnsgo
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/UnblockNeteaseMusic wall/ddns-go wall/gost wall/smartdns wall/adguardhome wall/filebrowser ./ ; rm -rf wall

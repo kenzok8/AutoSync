@@ -58,7 +58,6 @@ git clone --depth 1 https://github.com/kenzok78/luci-theme-tomato
 git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config
 git clone --depth 1 https://github.com/kenzok78/luci-app-adguardhome
 git clone --depth 1 https://github.com/kenzok78/luci-app-advanced
-git clone --depth 1 https://github.com/kenzok78/luci-app-clash
 git clone --depth 1 https://github.com/kenzok78/luci-app-eqos
 git clone --depth 1 https://github.com/kenzok78/luci-app-easymesh
 git clone --depth 1 https://github.com/kenzok78/luci-app-fileassistant
@@ -69,6 +68,7 @@ git clone --depth 1 https://github.com/kenzok78/luci-app-smartdns
 git clone --depth 1 https://github.com/kenzok78/luci-theme-infinityfreedom ifit && mv -n ifit/luci-theme-ifit ./;rm -rf ifit
 git clone --depth 1 https://github.com/kenzok78/luci-design-bundle design-bundle && mv -n design-bundle/*design ./; rm -rf design-bundle
 git clone --depth 1 https://github.com/kenzok78/luci-app-amlogic amlogic && mv -n amlogic/luci-app-amlogic ./;rm -rf amlogic
+git clone --depth 1 https://github.com/kenzok8/openwrt-clashoo openwrt-clashoo && mv -n openwrt-clashoo/*clashoo ./; rm -rf openwrt-clashoo
 git clone --depth 1 -b v5 https://github.com/sbwml/luci-app-mosdns openwrt-mos && mv -n openwrt-mos/*mosdns ./ && rm -rf openwrt-mos
 git clone --depth 1 https://github.com/sirpdboy/luci-app-partexp
 git clone --depth 1 -b master https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic

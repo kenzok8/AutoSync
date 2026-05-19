@@ -73,6 +73,7 @@ git clone --depth 1 https://github.com/kenzok78/luci-app-amlogic amlogic && mv -
 git clone --depth 1 https://github.com/kenzok8/openwrt-clashoo openwrt-clashoo && mv -n openwrt-clashoo/*clashoo ./; rm -rf openwrt-clashoo
 git clone --depth 1 -b v5 https://github.com/sbwml/luci-app-mosdns openwrt-mos && mv -n openwrt-mos/*mosdns ./ && rm -rf openwrt-mos
 git clone --depth 1 https://github.com/sirpdboy/luci-app-partexp
+git clone --depth 1 https://github.com/sbwml/luci-app-quickfile
 git clone --depth 1 -b master https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic
 git clone --depth 1 https://github.com/linkease/istore && mv -n istore/luci/* ./; rm -rf istore
 git clone --depth 1 https://github.com/0x2196f3/luci-app-subconverter app-subconverter && cp -r app-subconverter/luci-app-subconverter ./;rm -rf app-subconverter

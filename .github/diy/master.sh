@@ -48,6 +48,7 @@ git_sparse_clone main https://github.com/kenzok78/luci-design-bundle luci-design
 #git clone --depth 1 https://github.com/Huangjoe123/luci-app-eqos
 #git clone --depth 1 https://github.com/jerrykuku/lua-maxminddb
 git clone --depth 1 https://github.com/sirpdboy/luci-app-partexp
+git clone --depth 1 https://github.com/sbwml/luci-app-quickfile
 git clone --depth 1 -b master https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic
 git clone --depth 1 https://github.com/ophub/luci-app-amlogic amlogic && mv -n amlogic/luci-app-amlogic ./;rm -rf amlogic
 git clone --depth 1 https://github.com/0x2196f3/luci-app-subconverter app-subconverter && cp -r app-subconverter/luci-app-subconverter ./;rm -rf app-subconverter

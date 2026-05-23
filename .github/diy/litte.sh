@@ -90,7 +90,7 @@ git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/* ./ ; rm -rf 
   -e 's/^PKG_SOURCE_URL:=.*/PKG_SOURCE_URL:=https:\/\/codeload.github.com\/kenzok8\/ucl\/tar.gz\/v$(PKG_VERSION)?/' \
   -e 's/^[[:space:]]*URL:=.*/  URL:=https:\/\/github.com\/kenzok8\/ucl/' \
   ucl/Makefile
-git clone --depth 1 https://github.com/QiuSimons/luci-app-daed-next daed1 && mvdir daed1
+git clone --depth 1 -b v5 https://github.com/sbwml/openwrt_helloworld daed-luci && mv -n daed-luci/luci-app-daed ./; rm -rf daed-luci
 git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go ddnsgo && mv -n ddnsgo/luci-app-ddns-go ./; rm -rf ddnsgo
 git clone --depth 1 -b main https://github.com/Openwrt-Passwall/openwrt-passwall passwall1 && mv -n passwall1/luci-app-passwall  ./; rm -rf passwall1
 git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall2 passwall2 && mv -n passwall2/luci-app-passwall2 ./;rm -rf passwall2
@@ -106,7 +106,7 @@ git clone --depth 1 https://github.com/muink/openwrt-fchomo openwrt-fchomo && mv
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-kucat openwrt-kucat && mv -n openwrt-kucat/luci-theme-kucat ./ ; rm -rf openwrt-kucat
 git clone --depth 1 https://github.com/AngelaCooljx/luci-theme-material3
 git clone --depth 1 https://github.com/sbwml/luci-app-openlist2 oplist && mvdir oplist
-git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-dae,luci-app-daed,luci-app-diskman,luci-app-filebrowser-go,luci-app-microsocks,luci-app-openlist,luci-app-qbittorrent,luci-app-snmpd,luci-app-transmission,luci-app-v2raya,luci-app-watchcat,luci-app-eoip} ./ ; rm -rf luci
+git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-dae,luci-app-diskman,luci-app-filebrowser-go,luci-app-microsocks,luci-app-openlist,luci-app-qbittorrent,luci-app-snmpd,luci-app-transmission,luci-app-v2raya,luci-app-watchcat,luci-app-eoip} ./ ; rm -rf luci
 #git clone --depth 1 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-argon-config,luci-app-dae,luci-app-daed,luci-app-diskman,luci-app-filebrowser-go,luci-app-filebrowser,luci-app-gost,luci-app-microsocks,luci-app-openlist,luci-app-qbittorrent,luci-app-snmpd,luci-app-smartdns,luci-app-transmission,luci-app-v2raya,luci-app-watchcat,luci-app-eoip,luci-app-smartdns} ./ ; rm -rf luci
 
 # Remove conflicting i18n packages that cause opkg install errors

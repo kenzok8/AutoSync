@@ -16,6 +16,7 @@ rm -rf $1
 }
 
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/* ./ ; rm -rf {UnblockNeteaseMusic,adguardhome,alist,ddns-go,docker,dockerd,filebrowser,gost,lucky,mosdns,sagernet-core,smartdns,ucl,upx-static,upx} && rm -rf wall
+git clone --depth 1 -b v5 https://github.com/sbwml/openwrt_helloworld daed-luci && mv -n daed-luci/luci-app-daed ./; rm -rf daed-luci
 #git clone --depth 1 -b v5-lua https://github.com/kenzok78/luci-app-mosdns openwrt-mos && mv -n openwrt-mos/luci-app-mosdns ./; rm -rf openwrt-mos
 #git clone --depth 1 -b v5 https://github.com/kenzok8/luci-app-mosdns openwrt-mos1 && mv -n openwrt-mos1/mosdns ./; rm -rf openwrt-mos1
 git clone --depth 1 -b v5 https://github.com/sbwml/luci-app-mosdns openwrt-mos && mv -n openwrt-mos/*mosdns ./ && rm -rf openwrt-mos

@@ -48,13 +48,12 @@ git clone --depth 1 https://github.com/yaof2/luci-app-ikoolproxy
 #git clone --depth 1 https://github.com/honwen/luci-app-aliddns
 #git clone --depth 1 https://github.com/hubbylei/luci-app-clash
 #git clone --depth 1 -b v5 https://github.com/kenzok78/luci-app-mosdns openwrt-mos1 && mv -n openwrt-mos1/mosdns ./; rm -rf openwrt-mos1
-#git clone --depth 1 https://github.com/sbwml/luci-app-daed daed1 && mv -n daed1/*daed ./; rm -rf daed1
 #git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
 #git clone --depth 1 -b openwrt-18.06 https://github.com/tty228/luci-app-wechatpush
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-opentopd
 git clone --depth 1 https://github.com/derisamedia/luci-theme-alpha
 git clone --depth 1 https://github.com/rchen14b/luci-theme-glass
-git clone --depth 1 https://github.com/kenzok8/luci-app-daed
+git clone --depth 1 https://github.com/kenzok8/luci-app-daede daede-luci && mv -n daede-luci/luci-app-daede ./; rm -rf daede-luci
 git clone --depth 1 https://github.com/kenzok78/luci-theme-atmaterial_new
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argone
 git clone --depth 1 https://github.com/kenzok78/luci-theme-tomato
@@ -91,7 +90,7 @@ git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/* ./ ; rm -rf 
   -e 's/^PKG_SOURCE_URL:=.*/PKG_SOURCE_URL:=https:\/\/codeload.github.com\/kenzok8\/ucl\/tar.gz\/v$(PKG_VERSION)?/' \
   -e 's/^[[:space:]]*URL:=.*/  URL:=https:\/\/github.com\/kenzok8\/ucl/' \
   ucl/Makefile
-git clone --depth 1 -b v5 https://github.com/sbwml/openwrt_helloworld daed-luci && mv -n daed-luci/luci-app-daed ./; rm -rf daed-luci
+#git clone --depth 1 -b v5 https://github.com/sbwml/openwrt_helloworld daed-luci && mv -n daed-luci/luci-app-daed ./; rm -rf daed-luci
 git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go ddnsgo && mv -n ddnsgo/luci-app-ddns-go ./; rm -rf ddnsgo
 git clone --depth 1 -b main https://github.com/Openwrt-Passwall/openwrt-passwall passwall1 && mv -n passwall1/luci-app-passwall  ./; rm -rf passwall1
 git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall2 passwall2 && mv -n passwall2/luci-app-passwall2 ./;rm -rf passwall2

@@ -53,7 +53,7 @@ git clone --depth 1 https://github.com/yaof2/luci-app-ikoolproxy
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-opentopd
 git clone --depth 1 https://github.com/derisamedia/luci-theme-alpha
 git clone --depth 1 https://github.com/rchen14b/luci-theme-glass
-git clone --depth 1 https://github.com/kenzok8/openwrt-daede openwrt-daede && cp -rf openwrt-daede/luci-app-daede ./; rm -rf 
+git clone --depth 1 https://github.com/kenzok8/openwrt-daede && cp -rf openwrt-daede/luci-app-daede ./; rm -rf openwrt-daede
 git clone --depth 1 https://github.com/kenzok78/luci-theme-atmaterial_new
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argone
 git clone --depth 1 https://github.com/kenzok78/luci-theme-tomato

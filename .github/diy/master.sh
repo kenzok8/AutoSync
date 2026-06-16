@@ -19,8 +19,6 @@ git clone --depth 1 https://github.com/sirpdboy/luci-app-netwizard app-netwizard
 git clone --depth 1 https://github.com/kiddin9/luci-app-dnsfilter
 git clone --depth 1 -b openwrt-18.06 https://github.com/tty228/luci-app-wechatpush
 #git clone --depth 1 https://github.com/ntlf9t/luci-app-easymesh
-#git clone --depth 1 https://github.com/yaof2/luci-app-ikoolproxy
-#git clone --depth 1 -b 18.06 https://github.com/jerrykuku/luci-theme-argon
 #git clone --depth 1 https://github.com/sirpdboy/luci-app-advanced
 git clone --depth 1 https://github.com/jerrykuku/luci-theme-argon
 git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config
@@ -30,8 +28,8 @@ git clone --depth 1 https://github.com/derisamedia/luci-theme-alpha
 #git clone --depth 1 https://github.com/sbwml/luci-app-mosdns openwrt-mos && mv -n openwrt-mos/{*mosdns,v2dat} ./; rm -rf openwrt-mos
 git clone --depth 1 https://github.com/kenzok78/luci-theme-infinityfreedom ifit && mv -n ifit/luci-theme-ifit ./;rm -rf ifit
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-kucat openwrt-kucat && mv -n openwrt-kucat/luci-theme-kucat ./ ; rm -rf openwrt-kucat
-git clone --depth 1 https://github.com/kenzok78/luci-theme-argone
-git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config
+#git clone --depth 1 https://github.com/kenzok78/luci-theme-argone
+#git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config
 git clone --depth 1 https://github.com/kenzok78/luci-app-adguardhome
 git clone --depth 1 https://github.com/kenzok78/luci-app-advanced
 git clone --depth 1 https://github.com/kenzok78/luci-app-aliddns
@@ -76,6 +74,7 @@ sed -i \
 
 sed -i 's/luci-lib-ipkg/luci-base/g' luci-app-store/Makefile
 sed -i 's/+dockerd/+dockerd +cgroupfs-mount/' luci-app-docker*/Makefile
+sed -i 's/PKG_VERSION:=v/PKG_VERSION:=/' luci-app-dockerman/Makefile
 sed -i '$i /etc/init.d/dockerd restart &' luci-app-docker*/root/etc/uci-defaults/*
 #sed -i 's/+libcap /+libcap +libcap-bin /' luci-app-openclash/Makefile
 sed -i 's/\(+luci-compat\)/\1 +luci-theme-argon/' luci-app-argon-config/Makefile

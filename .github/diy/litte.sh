@@ -52,6 +52,7 @@ git clone --depth 1 https://github.com/yaof2/luci-app-ikoolproxy
 #git clone --depth 1 -b openwrt-18.06 https://github.com/tty228/luci-app-wechatpush
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-opentopd
 git clone --depth 1 https://github.com/derisamedia/luci-theme-alpha
+git clone --depth 1 https://github.com/animegasan/luci-app-alpha-config
 git clone --depth 1 https://github.com/rchen14b/luci-theme-glass
 git clone --depth 1 https://github.com/kenzok8/openwrt-daede openwrt-daede && cp -rf openwrt-daede/{dae,daed,luci-app-daede} ./; rm -rf openwrt-daede
 git clone --depth 1 https://github.com/kenzok78/luci-theme-atmaterial_new

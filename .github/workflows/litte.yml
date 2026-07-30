@@ -15,6 +15,9 @@ on:
         required: false
         default: 'false'
 
+env:
+  TZ: Asia/Shanghai
+
 jobs:
   job_litte:
     if: github.event.repository.owner.id == github.event.sender.id || ! github.event.sender.id
@@ -36,7 +39,6 @@ jobs:
       run: |
         git config --global user.email "actions@github.com"
         git config --global user.name "action"
-        sudo timedatectl set-timezone "Asia/Shanghai"
 
     - name: Clone packages
       run: |

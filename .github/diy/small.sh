@@ -26,6 +26,7 @@ git clone --depth 1 https://github.com/nikkinikki-org/OpenWrt-momo OpenWrt-momo 
 git clone --depth 1 https://github.com/nikkinikki-org/OpenWrt-nikki OpenWrt-nikki && mv -n OpenWrt-nikki/*nikki ./ ; rm -rf OpenWrt-nikki
 git clone --depth 1 https://github.com/kenzok8/openwrt-clashoo openwrt-clashoo && mv -n openwrt-clashoo/*clashoo ./; rm -rf openwrt-clashoo
 git clone --depth 1 https://github.com/muink/openwrt-fchomo openwrt-fchomo && mv -n openwrt-fchomo/*homo ./ ; rm -rf openwrt-fchomo
+git clone --depth 1 https://github.com/QiuSimons/luci-app-honk wrt-honk && mv -n wrt-honk/*honk ./ ; rm -rf wrt-honk
 git clone --depth 1 https://github.com/immortalwrt/homeproxy luci-app-homeproxy
 
 sed -i \

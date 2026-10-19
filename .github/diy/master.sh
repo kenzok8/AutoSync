@@ -73,6 +73,31 @@ sed -i \
 -e 's/ca-certificates/ca-bundle/' \
 */Makefile
 
+# ── 去重 BuildPackage 注册：feeds/luci/luci.mk 已为 $(PKG_NAME) 调过一次 ──
+# ── BuildPackage，下面 8 个包 include luci.mk 后又显式 eval，包会在 ──
+# ── menuconfig 里出现两条。删掉重复那次（连同 signature 注释） ──
+sed -i \
+-e '/^# call BuildPackage - OpenWrt buildroot signature$/d' \
+-e '/^\$(eval \$(call BuildPackage,/d' \
+luci-theme-atmaterial_new/Makefile \
+luci-app-smartdns/Makefile \
+luci-app-gost/Makefile \
+luci-app-fileassistant/Makefile \
+luci-app-eqos/Makefile \
+luci-app-easymesh/Makefile \
+luci-app-advanced/Makefile \
+luci-app-adguardhome/Makefile
+
+# luci-app-openclaw：eval 必须只在 standalone（else）分支里；
+# feed 模式下 luci.mk 已注册，无条件的 eval 会重复。
+# 先删现有的 eval，再插到第一个 endif 之前（即 else 分支内）；已在 else 内时结果不变，幂等。
+if grep -q '^\$(eval \$(call BuildPackage,\$(PKG_NAME)))$' luci-app-openclaw/Makefile; then
+  sed -i \
+  -e '/^\$(eval \$(call BuildPackage,\$(PKG_NAME)))$/d' \
+  -e '0,/^endif$/s//$(eval $(call BuildPackage,$(PKG_NAME)))\n&/' \
+  luci-app-openclaw/Makefile
+fi
+
 sed -i 's/luci-lib-ipkg/luci-base/g' luci-app-store/Makefile
 sed -i 's/+dockerd/+dockerd +cgroupfs-mount/' luci-app-docker*/Makefile
 sed -i 's/PKG_VERSION:=v/PKG_VERSION:=/' luci-app-dockerman/Makefile

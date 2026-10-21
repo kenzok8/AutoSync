@@ -73,12 +73,16 @@ sed -i \
 -e 's/ca-certificates/ca-bundle/' \
 */Makefile
 
-# ── 去重 BuildPackage 注册：feeds/luci/luci.mk 已为 $(PKG_NAME) 调过一次 ──
-# ── BuildPackage，下面 8 个包 include luci.mk 后又显式 eval，包会在 ──
-# ── menuconfig 里出现两条。删掉重复那次（连同 signature 注释） ──
+# ── BuildPackage 注册守卫（#562/#563）：官方 luci.mk（19.07 起均是）──
+# ── 会把 $(PKG_NAME) 收进 LUCI_BUILD_PACKAGES 并在结尾统一注册； ──
+# ── 没有这套机制的老版/fork luci.mk 只能靠 Makefile 自己的 eval 行。 ──
+# ── 直接删 eval 行，老 luci 用户的包会整个消失（#563）；保留原样， ──
+# ── 新 luci 下又会重复注册、menuconfig 出现两条（#562）。改为加守卫： ──
+# ── LUCI_BUILD_PACKAGES 已含本包时跳过 eval，否则照常注册。幂等： ──
+# ── 守卫行以 $(if 开头，不会命中下面规则、不会被重复包裹。 ──
 sed -i \
--e '/^# call BuildPackage - OpenWrt buildroot signature$/d' \
--e '/^\$(eval \$(call BuildPackage,/d' \
+-e 's|^\$(eval \$(call BuildPackage,\([A-Za-z0-9_+.-]*\)))$|$(if $(filter \1,$(LUCI_BUILD_PACKAGES)),,$(eval $(call BuildPackage,\1)))|' \
+-e 's|^\$(eval \$(call BuildPackage,\$(PKG_NAME)))$|$(if $(filter $(PKG_NAME),$(LUCI_BUILD_PACKAGES)),,$(eval $(call BuildPackage,$(PKG_NAME))))|' \
 luci-theme-atmaterial_new/Makefile \
 luci-app-smartdns/Makefile \
 luci-app-gost/Makefile \
@@ -86,17 +90,8 @@ luci-app-fileassistant/Makefile \
 luci-app-eqos/Makefile \
 luci-app-easymesh/Makefile \
 luci-app-advanced/Makefile \
-luci-app-adguardhome/Makefile
-
-# luci-app-openclaw：eval 必须只在 standalone（else）分支里；
-# feed 模式下 luci.mk 已注册，无条件的 eval 会重复。
-# 先删现有的 eval，再插到第一个 endif 之前（即 else 分支内）；已在 else 内时结果不变，幂等。
-if grep -q '^\$(eval \$(call BuildPackage,\$(PKG_NAME)))$' luci-app-openclaw/Makefile; then
-  sed -i \
-  -e '/^\$(eval \$(call BuildPackage,\$(PKG_NAME)))$/d' \
-  -e '0,/^endif$/s//$(eval $(call BuildPackage,$(PKG_NAME)))\n&/' \
-  luci-app-openclaw/Makefile
-fi
+luci-app-adguardhome/Makefile \
+luci-app-openclaw/Makefile
 
 sed -i 's/luci-lib-ipkg/luci-base/g' luci-app-store/Makefile
 sed -i 's/+dockerd/+dockerd +cgroupfs-mount/' luci-app-docker*/Makefile

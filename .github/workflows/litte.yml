@@ -172,11 +172,14 @@ jobs:
         fi
 
         if [ "$committed_any" = "true" ]; then
-          # push 偶发鉴权抖动（could not read Username），失败等 10 秒重试一次；
-          # 两次都失败才让步骤失败，错误保持可见。
+          # 认证走 Authorization 头（与 actions/checkout 同一机制）：token 嵌
+          # URL 时 git 间歇性掉进交互提示分支（could not read Username），
+          # 头部认证预先发送、无此环节。失败等 10 秒重试一次，两次都
+          # 失败才让步骤失败，错误保持可见。
+          auth_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$ACCESS_TOKEN" | base64 -w0)"
           push_ok=false
           for attempt in 1 2; do
-            if git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master; then
+            if git -c "http.https://github.com/.extraheader=$auth_header" push --quiet "https://github.com/kenzok8/litte.git" HEAD:master; then
               push_ok=true
               break
             fi

@@ -172,7 +172,23 @@ jobs:
         fi
 
         if [ "$committed_any" = "true" ]; then
-          git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master
+          # push 偶发鉴权抖动（could not read Username），失败等 10 秒重试一次；
+          # 两次都失败才让步骤失败，错误保持可见。
+          push_ok=false
+          for attempt in 1 2; do
+            if git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/kenzok8/litte.git" HEAD:master; then
+              push_ok=true
+              break
+            fi
+            if [ "$attempt" = "1" ]; then
+              echo "⚠️ push 失败，10 秒后重试"
+              sleep 10
+            fi
+          done
+          if [ "$push_ok" != "true" ]; then
+            echo "::error::push 两次均失败"
+            exit 1
+          fi
           echo "✅ Push 完成"
         else
           echo "ℹ️ nothing to push"

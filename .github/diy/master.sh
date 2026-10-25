@@ -43,6 +43,7 @@ git clone --depth 1 https://github.com/kenzok78/luci-app-gost
 git clone --depth 1 https://github.com/kenzok78/luci-app-smartdns
 git clone --depth 1 https://github.com/rchen14b/luci-theme-glass
 git_sparse_clone main https://github.com/kenzok78/luci-design-bundle luci-design-bundle luci-theme-design luci-app-design-config
+git clone --depth 1 https://github.com/kenzok8/openwrt-tower openwrt-tower && mv -n openwrt-tower/*tower ./; rm -rf openwrt-tower
 #git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
 #git clone --depth 1 https://github.com/Huangjoe123/luci-app-eqos
 #git clone --depth 1 https://github.com/jerrykuku/lua-maxminddb

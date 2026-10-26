@@ -60,10 +60,94 @@ jobs:
         : > /tmp/version_changed_packages.txt
         : > /tmp/package_version_map.txt
 
+        # 版本取值：按 Makefile 顺序展开 $(VAR) 与 $(subst a,b,text)，得到真实字面值
+        # （如 sing-box 的 1.15.0_alpha13）；全是表达式时退回 PKG_UPSTREAM_VERSION / PKG_REAL_VERSION
+        cat > /tmp/get_ver.awk <<'AWK'
+        function streplace(s, from, to,   out, p) {
+        	if (from == "")
+        		return s
+        	out = ""
+        	while ((p = index(s, from)) > 0) {
+        		out = out substr(s, 1, p - 1) to
+        		s = substr(s, p + length(from))
+        	}
+        	return out s
+        }
+
+        function expand(v,   name, start, i, depth, c, endpos, inner, p1, p2, from, to, text) {
+        	while (match(v, /\$\([A-Za-z_][A-Za-z0-9_]*\)/)) {
+        		name = substr(v, RSTART + 2, RLENGTH - 3)
+        		if (!(name in lit))
+        			return ""
+        		v = substr(v, 1, RSTART - 1) lit[name] substr(v, RSTART + RLENGTH)
+        	}
+        	while ((start = index(v, "$(subst ")) > 0) {
+        		depth = 0
+        		endpos = 0
+        		for (i = start + 1; i <= length(v); i++) {
+        			c = substr(v, i, 1)
+        			if (c == "(") {
+        				depth++
+        			} else if (c == ")") {
+        				depth--
+        				if (depth == 0) {
+        					endpos = i
+        					break
+        				}
+        			}
+        		}
+        		if (!endpos)
+        			return ""
+        		inner = substr(v, start + 8, endpos - start - 8)
+        		p1 = index(inner, ",")
+        		if (!p1)
+        			return ""
+        		from = substr(inner, 1, p1 - 1)
+        		rest = substr(inner, p1 + 1)
+        		p2 = index(rest, ",")
+        		if (!p2)
+        			return ""
+        		to = substr(rest, 1, p2 - 1)
+        		text = substr(rest, p2 + 1)
+        		v = substr(v, 1, start - 1) streplace(text, from, to) substr(v, endpos + 1)
+        	}
+        	return v
+        }
+
+        /^[A-Za-z_][A-Za-z0-9_]*[[:space:]]*:?=/ {
+        	eq = index($0, "=")
+        	name = substr($0, 1, eq - 1)
+        	gsub(/[[:space:]:]/, "", name)
+        	val = substr($0, eq + 1)
+        	sub(/^[[:space:]]*/, "", val)
+        	sub(/[[:space:]]+$/, "", val)
+        	names[++cnt] = name
+        	vals[cnt] = val
+        }
+
+        END {
+        	for (i = 1; i <= cnt; i++)
+        		if (vals[i] !~ /\$\(/)
+        			lit[names[i]] = vals[i]
+        	for (i = 1; i <= cnt; i++) {
+        		if (names[i] != "PKG_VERSION" && names[i] != "LUCI_VERSION")
+        			continue
+        		val = vals[i]
+        		if (val ~ /\$\(/) {
+        			lit[names[i]] = ver
+        			val = expand(val)
+        		}
+        		if (val != "" && val !~ /\$\(/)
+        			ver = val
+        	}
+        	if (ver == "")
+        		ver = lit["PKG_UPSTREAM_VERSION"] lit["PKG_REAL_VERSION"]
+        	print ver
+        }
+        AWK
+
         get_ver() {
-          awk '/^(PKG_VERSION|LUCI_VERSION)[[:space:]]*:?=/{
-            sub(/^[^=]*=[[:space:]]*/,""); gsub(/[[:space:]]+$/,""); print; exit
-          }' "$1"
+          awk -f /tmp/get_ver.awk "$1"
         }
 
         # 遍历所有 Makefile（新包 untracked 也能捕获）
@@ -75,9 +159,7 @@ jobs:
 
           old_ver=""
           if git cat-file -e "HEAD:${makefile}" 2>/dev/null; then
-            old_ver=$(git show "HEAD:${makefile}" | awk '/^(PKG_VERSION|LUCI_VERSION)[[:space:]]*:?=/{
-              sub(/^[^=]*=[[:space:]]*/,""); gsub(/[[:space:]]+$/,""); print; exit
-            }')
+            old_ver=$(git show "HEAD:${makefile}" | awk -f /tmp/get_ver.awk)
           fi
 
           if [ "$new_ver" != "$old_ver" ]; then

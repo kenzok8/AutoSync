@@ -86,7 +86,8 @@ git clone --depth 1 https://github.com/lisaac/luci-app-dockerman dockerman && mv
 git clone --depth 1 https://github.com/vernesong/OpenClash && mv -n OpenClash/luci-app-openclash ./; rm -rf OpenClash
 git clone --depth 1 https://github.com/kenzok8/luci-app-openclaw
 #git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-atmaterial_new litte/luci-theme-tomato ./ ; rm -rf litte
-git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/* ./ ; rm -rf wall
+# wall 里除 sing-box 外全部保留；sing-box 改由下方 VIKINGYFY 与 luci-app-homeproxy 成对提供
+git clone --depth 1 https://github.com/kenzok8/wall && rm -rf wall/sing-box && mv -n wall/* ./ ; rm -rf wall
 [ -f ucl/Makefile ] && sed -i \
   -e 's/^PKG_SOURCE_URL:=.*/PKG_SOURCE_URL:=https:\/\/codeload.github.com\/kenzok8\/ucl\/tar.gz\/v$(PKG_VERSION)?/' \
   -e 's/^[[:space:]]*URL:=.*/  URL:=https:\/\/github.com\/kenzok8\/ucl/' \
@@ -102,7 +103,9 @@ git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/la
 git clone --depth 1 https://github.com/nikkinikki-org/OpenWrt-momo OpenWrt-momo && mv -n OpenWrt-momo/*momo ./ ; rm -rf OpenWrt-momo
 git clone --depth 1 https://github.com/nikkinikki-org/OpenWrt-nikki OpenWrt-nikki && mv -n OpenWrt-nikki/*nikki ./ ; rm -rf OpenWrt-nikki
 git clone --depth 1 https://github.com/muink/openwrt-fchomo openwrt-fchomo && mv -n openwrt-fchomo/*homo ./ ; rm -rf openwrt-fchomo
-git clone --depth 1 https://github.com/immortalwrt/homeproxy luci-app-homeproxy
+# luci-app-homeproxy 与 sing-box 必须成对取自同一上游：新版 luci 运行时会硬校验 sing-box >= 1.15，
+# 且依赖其 1.15 配置项与 DNS TCP 补丁，配置 wall 的 1.14.x 会导致插件无法启动
+git_sparse_clone main https://github.com/VIKINGYFY/packages vk-packages luci-app-homeproxy sing-box
 git clone --depth 1 https://github.com/muink/openwrt-fchomo openwrt-fchomo && mv -n openwrt-fchomo/*homo ./ ; rm -rf openwrt-fchomo
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-kucat openwrt-kucat && mv -n openwrt-kucat/luci-theme-kucat ./ ; rm -rf openwrt-kucat
 #git clone --depth 1 https://github.com/QiuSimons/luci-app-honk wrt-honk && mv -n wrt-honk/*honk ./ ; rm -rf wrt-honk
@@ -141,6 +144,9 @@ sed -i 's/+dockerd/+dockerd +cgroupfs-mount/' luci-app-docker*/Makefile
 sed -i 's/PKG_VERSION:=v/PKG_VERSION:=/' luci-app-dockerman/Makefile
 sed -i '$i /etc/init.d/dockerd restart &' luci-app-docker*/root/etc/uci-defaults/*
 sed -i 's/+libcap /+libcap +libcap-bin /' luci-app-openclash/Makefile
+# sing-box 1.15 把 independent_cache / store_rdrc 从警告升级为 FATAL，momo 默认值仍开启会导致内核启动失败
+sed -i -e "s/option 'dns_independent_cache' '1'/option 'dns_independent_cache' '0'/" \
+       -e "s/option 'cache_store_rdrc' '1'/option 'cache_store_rdrc' '0'/" momo/files/momo.conf
 sed -i 's/\(+luci-compat\)/\1 +luci-theme-argon/' luci-app-argon-config/Makefile
 sed -i 's/\(+luci-compat\)/\1 +luci-theme-design/' luci-theme-design-config/Makefile
 sed -i 's/\(+luci-compat\)/\1 +luci-theme-argone/' luci-app-argone-config/Makefile

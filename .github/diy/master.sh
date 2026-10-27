@@ -63,6 +63,9 @@ git clone --depth 1 https://github.com/lisaac/luci-app-dockerman dockerman && mv
 git clone --depth 1 https://github.com/kenzok8/luci-app-openclaw
 git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-atmaterial_new litte/luci-theme-tomato ./ ; rm -rf litte
 git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go ddnsgo && mv -n ddnsgo/luci-app-ddns-go ./; rm -rf ddnsgo
+# ── luci-app-ddns-go 上游补丁：网页勾选启用/重置密码后服务起不来 ──
+# ── 上游 sirpdboy/luci-app-ddns-go 未修，靠补丁持久化，避免每次同步被冲掉 ──
+patch -p1 -E --forward --no-backup-if-mismatch < "$GITHUB_WORKSPACE/.github/diy/luci-app-ddns-go.patch" || echo "⚠️ luci-app-ddns-go 补丁未应用"
 git clone --depth 1 https://github.com/kenzok8/wall && mv -n wall/UnblockNeteaseMusic wall/ddns-go wall/gost wall/smartdns wall/adguardhome wall/filebrowser ./ ; rm -rf wall
 #git clone --depth 1 -b openwrt-18.06 https://github.com/immortalwrt/luci && mv -n luci/applications/{luci-app-gost,luci-app-filebrowser} ./ && rm -rf luci
 git clone --depth 1 https://github.com/immortalwrt/packages && mv -n packages/lang/lua-maxminddb ./ ; rm -rf packages

@@ -40,9 +40,8 @@ rm -rf $1
 # 主要的包克隆逻辑
 echo "开始克隆包..."
 
-# ── luci-app-lucky 只取 LuCI 界面；lucky 二进制包从自有 wall 仓库取最新版（#564）──
-# ── 上游 sirpdboy/luci-app-lucky 停在 2.27.2（2026-03-12 后未更新），其 lucky/ 不再使用 ──
-git clone --depth 1 https://github.com/sirpdboy/luci-app-lucky lucik && rm -rf lucik/lucky && mv -n lucik luci-app-lucky; rm -rf lucik
+# ── luci-app-lucky 取 gdy666 官方版；lucky 二进制包从自有 wall 仓库取最新版（#564）──
+git clone --depth 1 https://github.com/gdy666/luci-app-lucky lucik && rm -rf lucik/lucky && mv -n lucik luci-app-lucky; rm -rf lucik
 mkdir -p luci-app-lucky
 git_sparse_clone main https://github.com/kenzok8/wall wall-lucky lucky && mv -n lucky luci-app-lucky/
 git clone --depth 1 https://github.com/sirpdboy/luci-app-netwizard app-netwizard && mv -n app-netwizard/*netwizard ./; rm -rf app-netwizard

@@ -15,6 +15,9 @@ mv -n `find $1/* -maxdepth 0 -type d` ./
 rm -rf $1
 }
 git clone --depth 1 https://github.com/sirpdboy/luci-app-lucky
+# ── luci-app-lucky 上游停在 2.27.2（2026-03-12 后未更新），本地 bump 到 lucky 3.5.0（#564）──
+# ── 上游哪天自己升到 3.5.0+，此 patch 因上下文对不上而跳过，届时可删 ──
+patch -p1 -E --forward --no-backup-if-mismatch < "$GITHUB_WORKSPACE/.github/diy/luci-app-lucky.patch" || echo "⚠️ luci-app-lucky 补丁未应用"
 git clone --depth 1 https://github.com/sirpdboy/luci-app-netwizard app-netwizard && mv -n app-netwizard/*netwizard ./; rm -rf app-netwizard
 git clone --depth 1 https://github.com/kiddin9/luci-app-dnsfilter
 git clone --depth 1 -b openwrt-18.06 https://github.com/tty228/luci-app-wechatpush

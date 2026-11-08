@@ -92,6 +92,7 @@ jobs:
         cat /tmp/package_version_map.txt
 
     - name: 🚀 Upload
+      id: upload
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
@@ -194,10 +195,23 @@ jobs:
             echo "::error::push 两次均失败"
             exit 1
           fi
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
           echo "✅ Push 完成"
         else
           echo "ℹ️ nothing to push"
         fi
+
+    - name: Rebuild the package index
+      if: steps.upload.outputs.pushed == 'true'
+      env:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      run: |
+        set -euo pipefail
+        curl -fsSL -X POST \
+          -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+          -H "Accept: application/vnd.github+json" \
+          https://api.github.com/repos/kenzok8/AutoSync/dispatches \
+          -d '{"event_type":"packages-site"}'
 
     - name: Delete workflow runs
       env:

@@ -14,6 +14,13 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
+      # gen.py lives in this repo: openwrt-packages is wiped clean on every
+      # sync, so anything committed there directly gets deleted. Check this
+      # repo out first (workspace root); pkg/ is checked out after it, so
+      # the checkout's clean step cannot remove pkg/.
+      - name: Checkout AutoSync
+        uses: actions/checkout@v7
+
       - name: Checkout openwrt-packages
         uses: actions/checkout@v7
         with:
@@ -25,7 +32,11 @@ jobs:
 
       - name: Generate the index
         working-directory: pkg
-        run: python3 site/gen.py
+        run: |
+          mkdir -p site
+          cp ../site/gen.py site/gen.py
+          touch .nojekyll
+          python3 site/gen.py
 
       - name: Commit if changed
         working-directory: pkg
@@ -35,7 +46,7 @@ jobs:
           set -euo pipefail
           git config user.name kenzok8
           git config user.email kenzok8@gmail.com
-          git add index.html
+          git add index.html .nojekyll
           if git diff --cached --quiet; then
             echo "no change"
             exit 0

@@ -40,8 +40,6 @@ jobs:
 
       - name: Commit if changed
         working-directory: pkg
-        env:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
           set -euo pipefail
           git config user.name kenzok8
@@ -52,5 +50,9 @@ jobs:
             exit 0
           fi
           git commit -m "Rebuild the package index"
-          auth_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$ACCESS_TOKEN" | base64 -w0)"
-          git -c "http.https://github.com/.extraheader=$auth_header" push origin HEAD:master
+          # Push with the credential the checkout step already persisted
+          # (ACCESS_TOKEN). Do NOT add another extraheader here: checkout
+          # already configures one via includeIf, and a second
+          # Authorization header makes GitHub reject the push with 400
+          # ("Duplicate header: Authorization").
+          git push origin HEAD:master

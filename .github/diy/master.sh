@@ -58,6 +58,10 @@ git clone --depth 1 https://github.com/0x2196f3/luci-app-subconverter app-subcon
 git clone --depth 1 https://github.com/linkease/istore && mv -n istore/luci/* ./; rm -rf istore
 git clone --depth 1 https://github.com/linkease/nas-packages && mv -n nas-packages/network/services/{ddnsto,quickstart} ./; rm -rf nas-packages
 git clone --depth 1 https://github.com/linkease/nas-packages-luci && mv -n nas-packages-luci/luci/{luci-app-ddnsto,luci-app-istorex,luci-app-quickstart} ./; rm -rf nas-packages-luci
+# luci-app-ddnsto 自带一条指向绝对路径的 symlink（/usr/share/ddnsto/ddnsto-plugin.json），
+# 在源码仓库里是悬空的，会让 GitHub Pages 的 tar --dereference 失败。改成相对链接，
+# 设备上解析结果不变，仓库里也能解析。
+[ -L luci-app-ddnsto/root/usr/share/linkease/apps.d/16-ddnsto.json ] && ln -sf ../../ddnsto/ddnsto-plugin.json luci-app-ddnsto/root/usr/share/linkease/apps.d/16-ddnsto.json
 #git clone --depth 1 https://github.com/messense/aliyundrive-webdav aliyundrive && mv -n aliyundrive/openwrt/* ./ ; rm -rf aliyundrive
 #git clone --depth 1 https://github.com/sbwml/luci-app-alist openwrt-alist && mv -n openwrt-alist/alist ./ ; rm -rf openwrt-alist
 git clone --depth 1 https://github.com/sbwml/luci-app-openlist2 oplist && mvdir oplist

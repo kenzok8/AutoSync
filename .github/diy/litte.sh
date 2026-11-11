@@ -58,6 +58,7 @@ git clone --depth 1 https://github.com/derisamedia/luci-theme-alpha
 git clone --depth 1 https://github.com/animegasan/luci-app-alpha-config
 git clone --depth 1 https://github.com/rchen14b/luci-theme-glass
 git clone --depth 1 https://github.com/zzsj0928/luci-theme-liquid
+git clone --depth 1 https://github.com/mrjoechen/luci-theme-carbon
 git clone --depth 1 https://github.com/kenzok8/openwrt-daede openwrt-daede && cp -rf openwrt-daede/{dae,daed,luci-app-daede} ./; rm -rf openwrt-daede
 git clone --depth 1 https://github.com/kenzok78/luci-theme-atmaterial_new
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argone

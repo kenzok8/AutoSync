@@ -24,9 +24,6 @@ git clone --depth 1 -b openwrt-18.06 https://github.com/tty228/luci-app-wechatpu
 #git clone --depth 1 https://github.com/sirpdboy/luci-app-advanced
 git clone --depth 1 https://github.com/jerrykuku/luci-theme-argon
 git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config
-git clone --depth 1 https://github.com/AngelaCooljx/luci-theme-material3
-git clone --depth 1 https://github.com/derisamedia/luci-theme-alpha
-git clone --depth 1 https://github.com/animegasan/luci-app-alpha-config
 #git clone --depth 1 https://github.com/QiuSimons/openwrt-mos && mv -n openwrt-mos/*mosdns ./ ; rm -rf openwrt-mos
 #git clone --depth 1 https://github.com/sbwml/luci-app-mosdns openwrt-mos && mv -n openwrt-mos/{*mosdns,v2dat} ./; rm -rf openwrt-mos
 git clone --depth 1 https://github.com/kenzok78/luci-theme-infinityfreedom ifit && mv -n ifit/luci-theme-ifit ./;rm -rf ifit
@@ -46,6 +43,16 @@ git clone --depth 1 https://github.com/kenzok78/luci-app-smartdns
 git clone --depth 1 https://github.com/rchen14b/luci-theme-glass
 git clone --depth 1 https://github.com/zzsj0928/luci-theme-liquid
 git clone --depth 1 https://github.com/mrjoechen/luci-theme-carbon
+# ── luci-theme-vantage + luci-app-vantage：同一仓库两个包，只留两个包目录； ──
+# ── 另把 README/CHANGELOG/截图留进主题包（README 里的图是相对路径， ──
+# ── 只改 logo 与 NOTICE 两处包名前缀；docs/ 其余文档、tests/ 等不带入） ──
+git clone --depth 1 https://github.com/anothaDev/luci-theme-vantage vantage
+mv -n vantage/luci-theme-vantage vantage/luci-app-vantage ./
+cp vantage/README.md vantage/CHANGELOG.md luci-theme-vantage/
+mkdir -p luci-theme-vantage/docs/screenshots
+cp vantage/docs/screenshots/*.png vantage/docs/screenshots/*.webp luci-theme-vantage/docs/screenshots/
+sed -i 's|luci-theme-vantage/htdocs/luci-static/vantage/logo.svg|htdocs/luci-static/vantage/logo.svg|; s|(luci-theme-vantage/NOTICE)|(NOTICE)|' luci-theme-vantage/README.md
+rm -rf vantage
 git_sparse_clone main https://github.com/kenzok78/luci-design-bundle luci-design-bundle luci-theme-design luci-app-design-config
 git clone --depth 1 https://github.com/kenzok8/openwrt-tower openwrt-tower && mv -n openwrt-tower/*tower ./; rm -rf openwrt-tower
 #git clone --depth 1 -b lede https://github.com/pymumu/luci-app-smartdns
@@ -69,7 +76,7 @@ git clone --depth 1 https://github.com/sbwml/luci-app-openlist2 oplist && mvdir 
 #git clone --depth 1 -b lua https://github.com/sbwml/luci-app-alist openwrt-alist1 && mv -n openwrt-alist1/luci-app-alist ./ ; rm -rf openwrt-alist1
 git clone --depth 1 https://github.com/lisaac/luci-app-dockerman dockerman && mv -n dockerman/applications/* ./; rm -rf dockerman
 git clone --depth 1 https://github.com/kenzok8/luci-app-openclaw
-git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-atmaterial_new litte/luci-theme-tomato ./ ; rm -rf litte
+git clone --depth 1 https://github.com/kenzok8/litte && mv -n litte/luci-theme-atmaterial_new ./ ; rm -rf litte
 git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go ddnsgo && mv -n ddnsgo/luci-app-ddns-go ./; rm -rf ddnsgo
 # ── luci-app-ddns-go 上游补丁：网页勾选启用/重置密码后服务起不来 ──
 # ── 上游 sirpdboy/luci-app-ddns-go 未修，靠补丁持久化，避免每次同步被冲掉 ──

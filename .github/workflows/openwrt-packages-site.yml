@@ -35,7 +35,6 @@ jobs:
         run: |
           mkdir -p site
           cp ../site/gen.py site/gen.py
-          touch .nojekyll
           python3 site/gen.py
 
       - name: Commit if changed
@@ -44,7 +43,7 @@ jobs:
           set -euo pipefail
           git config user.name kenzok8
           git config user.email kenzok8@gmail.com
-          git add index.html .nojekyll
+          git add index.html
           if git diff --cached --quiet; then
             echo "no change"
             exit 0
